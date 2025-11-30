@@ -1,516 +1,869 @@
-<!-- This is an HTML file -->
+Вот готовый код для полнофункциональной игры в одном HTML-файле:
 
-```python
-import pygame
-import random
-import sys
-import math
-from pygame import mixer
+```html
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Словарные слова на Д - Игра</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-# Инициализация Pygame
-pygame.init()
-mixer.init()
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0a141e 0%, #1a2a3a 100%);
+            color: #ecf0f1;
+            overflow: hidden;
+            user-select: none;
+        }
 
-# Константы экрана
-WIDTH, HEIGHT = 1200, 800
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Падающие слова - Тренажер грамотности")
+        #gameContainer {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
 
-# Цвета
-BACKGROUND = (10, 20, 30)
-ACCENT = (255, 215, 0)
-CORRECT = (46, 204, 113)
-ERROR = (231, 76, 60)
-ACTIVE_GAP = (241, 196, 15)
-TEXT_COLOR = (236, 240, 241)
-PANEL_BG = (30, 40, 50, 200)
+        #gameCanvas {
+            display: block;
+            background: #0a141e;
+        }
 
-# Шрифты
-try:
-    title_font = pygame.font.Font("arial.ttf", 48)
-    word_font = pygame.font.Font("arial.ttf", 36)
-    score_font = pygame.font.Font("arial.ttf", 28)
-    small_font = pygame.font.Font("arial.ttf", 20)
-except:
-    # Если шрифты не найдены, используем системные
-    title_font = pygame.font.SysFont("arial", 48)
-    word_font = pygame.font.SysFont("arial", 36)
-    score_font = pygame.font.SysFont("arial", 28)
-    small_font = pygame.font.SysFont("arial", 20)
+        #uiOverlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
 
-# Словарь слов
-vocabulary = [
-    {"word": "дебаты", "masked": "д..баты", "missing_letters": ["е", "а"]},
-    {"word": "декларация", "masked": "д..кл..рация", "missing_letters": ["е", "а", "а"]},
-    {"word": "декорация", "masked": "д..корация", "missing_letters": ["е", "о"]},
-    {"word": "декоративный", "masked": "д..коративный", "missing_letters": ["е", "о"]},
-    {"word": "деликатес", "masked": "д..л..к..тес", "missing_letters": ["е", "и", "а", "е"]},
-    {"word": "деликатный", "masked": "д..л..катный", "missing_letters": ["е", "и", "а"]},
-    {"word": "демократ", "masked": "д..м..крат", "missing_letters": ["е", "о", "а"]},
-    {"word": "демократичный", "masked": "д..м..кратичный", "missing_letters": ["е", "о", "а"]},
-    {"word": "демонстрировать", "masked": "д..м..нстрировать", "missing_letters": ["е", "о", "и"]},
-    {"word": "демонстрация", "masked": "д..м..нстрация", "missing_letters": ["е", "о", "а"]},
-    {"word": "диалог", "masked": "д..алог", "missing_letters": ["и", "а"]},
-    {"word": "диалоговый", "masked": "д..алоговый", "missing_letters": ["и", "а"]},
-    {"word": "диалогический", "masked": "д..алогический", "missing_letters": ["и", "а"]},
-    {"word": "диапазон", "masked": "д….пазон", "missing_letters": ["и", "а", "а"]},
-    {"word": "динамика", "masked": "д.намика", "missing_letters": ["и", "а"]},
-    {"word": "динамический", "masked": "д.намический", "missing_letters": ["и", "а"]},
-    {"word": "динамичный", "masked": "д.намичный", "missing_letters": ["и", "а"]},
-    {"word": "дирижер", "masked": "д..р..жёр", "missing_letters": ["и", "и", "ё"]},
-    {"word": "дирижировать", "masked": "д..р..жировать", "missing_letters": ["и", "и", "и"]},
-    {"word": "диспетчер", "masked": "д..спетчер", "missing_letters": ["и", "е"]},
-    {"word": "диспетчерский", "masked": "д..спетчерский", "missing_letters": ["и", "е"]},
-    {"word": "дистанция", "masked": "д..станция", "missing_letters": ["и", "а"]},
-    {"word": "дистанционный", "masked": "д..станционный", "missing_letters": ["и", "а"]},
-    {"word": "дисциплина", "masked": "д..сциплина", "missing_letters": ["и", "и"]},
-    {"word": "дисциплинарный", "masked": "д..сциплинарный", "missing_letters": ["и", "и", "а"]},
-    {"word": "дисциплинировать", "masked": "д..сциплинировать", "missing_letters": ["и", "и", "и"]}
-]
+        .panel {
+            background: rgba(30, 40, 50, 0.9);
+            padding: 15px 25px;
+            border-radius: 10px;
+            border: 2px solid #ffd700;
+            margin: 20px;
+            pointer-events: auto;
+        }
 
-class Particle:
-    def __init__(self, x, y, color):
-        self.x = x
-        self.y = y
-        self.color = color
-        self.size = random.randint(2, 6)
-        self.speed_x = random.uniform(-3, 3)
-        self.speed_y = random.uniform(-5, -1)
-        self.life = 1.0
+        #scorePanel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+
+        #levelPanel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            text-align: right;
+        }
+
+        #progressPanel {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            min-width: 300px;
+            text-align: center;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #34495e;
+            border-radius: 4px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2ecc71, #27ae60);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            pointer-events: auto;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #2ecc71, #27ae60);
+        }
+
+        #pauseBtn {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        #pauseScreen, #gameOverScreen, #levelUpScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .screen-content {
+            background: rgba(30, 40, 50, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            border: 3px solid #ffd700;
+            text-align: center;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        h1 {
+            color: #ffd700;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        }
+
+        h2 {
+            color: #3498db;
+            margin-bottom: 15px;
+        }
+
+        .word-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .word-item {
+            padding: 8px 12px;
+            background: rgba(52, 73, 94, 0.6);
+            border-radius: 5px;
+            border-left: 3px solid #2ecc71;
+        }
+
+        .revision-word {
+            border-left-color: #e74c3c;
+            background: rgba(231, 76, 60, 0.1);
+        }
+
+        .correct-letter {
+            color: #2ecc71;
+            font-weight: bold;
+        }
+
+        .stats {
+            font-size: 1.2em;
+            margin: 10px 0;
+        }
+
+        .affirmation {
+            font-size: 1.3em;
+            color: #2ecc71;
+            font-style: italic;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(46, 204, 113, 0.1);
+            border-radius: 10px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        #stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas"></canvas>
         
-    def update(self):
-        self.x += self.speed_x
-        self.y += self.speed_y
-        self.life -= 0.03
-        self.size -= 0.1
-        return self.life > 0 and self.size > 0
-    
-    def draw(self, surface):
-        alpha = int(self.life * 255)
-        color = (*self.color[:3], alpha)
-        pygame.draw.circle(surface, color, (int(self.x), int(self.y)), int(self.size))
-
-class FallingWord:
-    def __init__(self, word_data, x, speed):
-        self.word_data = word_data.copy()
-        self.x = x
-        self.y = -50
-        self.speed = speed
-        self.current_gap = 0
-        self.correctly_filled = []
-        self.error_animation = None
-        self.error_timer = 0
-        self.completion_animation = False
-        self.completion_timer = 1.0
-        self.particles = []
-        
-    def update(self):
-        if not self.completion_animation:
-            self.y += self.speed
+        <div id="uiOverlay">
+            <div id="scorePanel" class="panel">
+                <div>Счет: <span id="score">0</span></div>
+                <div>Жизни: <span id="lives">3</span></div>
+            </div>
             
-        if self.error_animation:
-            self.error_timer -= 0.016
-            if self.error_timer <= 0:
-                self.error_animation = None
+            <div id="levelPanel" class="panel">
+                <div>Уровень: <span id="level">1</span></div>
+                <div>Слов: <span id="wordsCompleted">0</span>/10</div>
+            </div>
+            
+            <button id="pauseBtn" class="btn">⏸️ Пауза</button>
+            
+            <div id="progressPanel" class="panel">
+                <div>Слова для повторения: <span id="revisionCount">0</span></div>
+                <div class="progress-bar">
+                    <div id="levelProgress" class="progress-fill" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Экран паузы -->
+        <div id="pauseScreen" class="hidden">
+            <div class="screen-content">
+                <h1>⏸️ ПАУЗА</h1>
+                <div id="revisionWords" class="word-list"></div>
+                <button id="resumeBtn" class="btn btn-success">Продолжить игру</button>
+                <button id="restartBtn" class="btn">Начать заново</button>
+            </div>
+        </div>
+
+        <!-- Экран завершения уровня -->
+        <div id="levelUpScreen" class="hidden">
+            <div class="screen-content">
+                <h1>🎉 УРОВЕНЬ <span id="newLevel">2</span>!</h1>
+                <div id="affirmation" class="affirmation"></div>
+                <div class="stats">
+                    <div>Набрано очков: <span id="levelScore">0</span></div>
+                    <div>Точность: <span id="accuracy">100%</span></div>
+                </div>
+                <button id="nextLevelBtn" class="btn btn-success">Следующий уровень</button>
+            </div>
+        </div>
+
+        <!-- Экран игры окончена -->
+        <div id="gameOverScreen" class="hidden">
+            <div class="screen-content">
+                <h1>💀 ИГРА ОКОНЧЕНА</h1>
+                <div class="stats">
+                    <div>Финальный счет: <span id="finalScore">0</span></div>
+                    <div>Достигнутый уровень: <span id="finalLevel">1</span></div>
+                    <div>Слов отгадано: <span id="totalWords">0</span></div>
+                </div>
+                <button id="playAgainBtn" class="btn btn-success">Играть снова</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="stars"></div>
+
+    <script>
+        // Словарь слов
+        const vocabulary = [
+            {word: "дебаты", masked: "д..баты", missing: ["е", "а"]},
+            {word: "декларация", masked: "д..кл..рация", missing: ["е", "а", "а"]},
+            {word: "декорация", masked: "д..корация", missing: ["е", "о"]},
+            {word: "декоративный", masked: "д..коративный", missing: ["е", "о"]},
+            {word: "деликатес", masked: "д..л..к..тес", missing: ["е", "и", "а", "е"]},
+            {word: "деликатный", masked: "д..л..катный", missing: ["е", "и", "а"]},
+            {word: "демократ", masked: "д..м..крат", missing: ["е", "о", "а"]},
+            {word: "демократичный", masked: "д..м..кратичный", missing: ["е", "о", "а"]},
+            {word: "демонстрировать", masked: "д..м..нстрировать", missing: ["е", "о", "и"]},
+            {word: "демонстрация", masked: "д..м..нстрация", missing: ["е", "о", "а"]},
+            {word: "диалог", masked: "д..алог", missing: ["и", "а"]},
+            {word: "диалоговый", masked: "д..алоговый", missing: ["и", "а"]},
+            {word: "диалогический", masked: "д..алогический", missing: ["и", "а"]},
+            {word: "диапазон", masked: "д….пазон", missing: ["и", "а", "а"]},
+            {word: "динамика", masked: "д.намика", missing: ["и", "а"]},
+            {word: "динамический", masked: "д.намический", missing: ["и", "а"]},
+            {word: "динамичный", masked: "д.намичный", missing: ["и", "а"]},
+            {word: "дирижер", masked: "д..р..жёр", missing: ["и", "и", "ё"]},
+            {word: "дирижировать", masked: "д..р..жировать", missing: ["и", "и", "и"]},
+            {word: "диспетчер", masked: "д..спетчер", missing: ["и", "е"]},
+            {word: "диспетчерский", masked: "д..спетчерский", missing: ["и", "е"]},
+            {word: "дистанция", masked: "д..станция", missing: ["и", "а"]},
+            {word: "дистанционный", masked: "д..станционный", missing: ["и", "а"]},
+            {word: "дисциплина", masked: "д..сциплина", missing: ["и", "и"]},
+            {word: "дисциплинарный", masked: "д..сциплинарный", missing: ["и", "и", "а"]},
+            {word: "дисциплинировать", masked: "д..сциплинировать", missing: ["и", "и", "и"]}
+        ];
+
+        // Аффирмации для перехода уровней
+        const affirmations = [
+            "Твой мозг становится сильнее с каждым словом! 💪",
+            "Грамотность - твой суперсила! 🦸‍♂️",
+            "Каждая ошибка делает тебя умнее! 🧠",
+            "Ты создаешь свое успешное будущее! 🌟",
+            "Знания - твоя самая крутая инвестиция! 💰",
+            "Ты становишься мастером слова! 📚",
+            "Образование - ключ к твоим мечтам! 🔑"
+        ];
+
+        class Game {
+            constructor() {
+                this.canvas = document.getElementById('gameCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.resizeCanvas();
                 
-        if self.completion_animation:
-            self.completion_timer -= 0.03
-            for _ in range(3):
-                self.particles.append(Particle(
-                    self.x + random.randint(-50, 50),
-                    self.y + random.randint(-20, 20),
-                    CORRECT
-                ))
-            
-            # Обновляем частицы
-            self.particles = [p for p in self.particles if p.update()]
-            
-            return self.completion_timer > 0
-            
-        return True
-    
-    def process_input(self, letter):
-        if self.completion_animation or self.error_animation:
-            return False
-            
-        correct_letter = self.word_data["missing_letters"][self.current_gap]
-        
-        if letter.lower() == correct_letter.lower():
-            self.correctly_filled.append(letter)
-            self.current_gap += 1
-            
-            if self.current_gap >= len(self.word_data["missing_letters"]):
-                self.completion_animation = True
-                # Создаем взрыв частиц
-                for _ in range(30):
-                    self.particles.append(Particle(
-                        self.x, self.y, CORRECT
-                    ))
-            
-            return True
-        else:
-            self.error_animation = letter
-            self.error_timer = 1.0
-            return False
-    
-    def draw(self, surface):
-        if self.completion_animation:
-            # Анимация завершения - увеличение и исчезновение
-            scale = 1.0 + (1.0 - self.completion_timer) * 0.5
-            alpha = int(self.completion_timer * 255)
-            
-            # Рисуем полное слово увеличенным
-            text_surface = word_font.render(self.word_data["word"], True, CORRECT)
-            text_rect = text_surface.get_rect(center=(self.x, self.y))
-            
-            # Масштабирование
-            new_width = int(text_rect.width * scale)
-            new_height = int(text_rect.height * scale)
-            scaled_surface = pygame.transform.scale(text_surface, (new_width, new_height))
-            scaled_rect = scaled_surface.get_rect(center=(self.x, self.y))
-            
-            # Устанавливаем прозрачность
-            scaled_surface.set_alpha(alpha)
-            surface.blit(scaled_surface, scaled_rect)
-            
-        else:
-            # Обычное отображение слова с пропусками
-            display_text = self.create_display_text()
-            color = ERROR if self.error_animation else TEXT_COLOR
-            
-            text_surface = word_font.render(display_text, True, color)
-            text_rect = text_surface.get_rect(center=(self.x, self.y))
-            surface.blit(text_surface, text_rect)
-        
-        # Рисуем частицы
-        for particle in self.particles:
-            particle.draw(surface)
-    
-    def create_display_text(self):
-        if self.error_animation:
-            # Показываем ошибку с зачеркиванием
-            return self.masked_with_error()
-        
-        text_parts = []
-        gap_index = 0
-        masked = self.word_data["masked"]
-        
-        i = 0
-        while i < len(masked):
-            if masked[i] == '.' or masked[i] == '…':
-                # Находим конец пропуска
-                j = i
-                while j < len(masked) and (masked[j] == '.' or masked[j] == '…'):
-                    j += 1
+                this.words = [];
+                this.score = 0;
+                this.lives = 3;
+                this.level = 1;
+                this.wordsCompleted = 0;
+                this.wordsForRevision = [];
+                this.gameState = 'playing';
+                this.spawnTimer = 0;
+                this.particles = [];
                 
-                gap_length = j - i
-                
-                if gap_index < self.current_gap:
-                    # Уже заполненный пропуск
-                    letter = self.correctly_filled[gap_index]
-                    text_parts.append(letter)
-                elif gap_index == self.current_gap:
-                    # Активный пропуск
-                    text_parts.append(f"[ _ ]")
-                else:
-                    # Будущий пропуск
-                    text_parts.append("_" * gap_length)
-                
-                gap_index += 1
-                i = j
-            else:
-                text_parts.append(masked[i])
-                i += 1
-        
-        return "".join(text_parts)
-    
-    def masked_with_error(self):
-        text_parts = []
-        gap_index = 0
-        masked = self.word_data["masked"]
-        
-        i = 0
-        while i < len(masked):
-            if masked[i] == '.' or masked[i] == '…':
-                j = i
-                while j < len(masked) and (masked[j] == '.' or masked[j] == '…'):
-                    j += 1
-                
-                gap_length = j - i
-                
-                if gap_index < self.current_gap:
-                    letter = self.correctly_filled[gap_index]
-                    text_parts.append(letter)
-                elif gap_index == self.current_gap:
-                    # Показываем ошибку с зачеркиванием
-                    text_parts.append(f"[ ̶{self.error_animation}̶ ]")
-                else:
-                    text_parts.append("_" * gap_length)
-                
-                gap_index += 1
-                i = j
-            else:
-                text_parts.append(masked[i])
-                i += 1
-        
-        return "".join(text_parts)
+                this.stars = this.createStars();
+                this.setupEventListeners();
+                this.gameLoop();
+            }
 
-class Game:
-    def __init__(self):
-        self.words = []
-        self.score = 0
-        self.lives = 3
-        self.level = 1
-        self.words_completed = 0
-        self.words_for_revision = []
-        self.game_state = "playing"  # playing, paused, game_over
-        self.spawn_timer = 0
-        self.background_stars = self.create_stars()
-        
-    def create_stars(self):
-        stars = []
-        for _ in range(100):
-            stars.append({
-                'x': random.randint(0, WIDTH),
-                'y': random.randint(0, HEIGHT),
-                'size': random.uniform(0.5, 2),
-                'brightness': random.uniform(0.3, 1.0)
-            })
-        return stars
-    
-    def update(self):
-        if self.game_state != "playing":
-            return
-            
-        # Обновляем падающие слова
-        self.words = [word for word in self.words if word.update()]
-        
-        # Спавн новых слов
-        self.spawn_timer -= 1
-        if self.spawn_timer <= 0:
-            self.spawn_word()
-            self.spawn_timer = random.randint(60, 120)  # 1-2 секунды
-            
-        # Проверка проигрыша (экран заполнен)
-        bottom_words = [word for word in self.words if word.y >= HEIGHT - 50 and not word.completion_animation]
-        if len(bottom_words) > 8:  # Если слишком много слов внизу
-            self.lives -= 1
-            if self.lives <= 0:
-                self.game_state = "game_over"
-            else:
-                # Удаляем несколько слов снизу
-                for word in bottom_words[:3]:
-                    if word in self.words:
-                        self.words.remove(word)
-    
-    def spawn_word(self):
-        if not vocabulary:
-            return
-            
-        word_data = random.choice(vocabulary)
-        x = random.randint(200, WIDTH - 200)
-        speed = random.uniform(1.0, 2.0) + self.level * 0.2
-        
-        new_word = FallingWord(word_data, x, speed)
-        self.words.append(new_word)
-    
-    def handle_input(self, letter):
-        if self.game_state != "playing":
-            return False
-            
-        for word in self.words:
-            if not word.completion_animation and not word.error_animation:
-                if word.process_input(letter):
-                    if word.completion_animation:
-                        self.words_completed += 1
-                        self.score += 100 * self.level
-                        # Проверка перехода на новый уровень
-                        if self.words_completed >= 10:
-                            self.level_up()
-                    return True
-                elif word.error_animation:
-                    # Добавляем слово в список для повторения, если его там еще нет
-                    if word.word_data not in self.words_for_revision:
-                        self.words_for_revision.append(word.word_data)
-                    return False
-        return False
-    
-    def level_up(self):
-        self.level += 1
-        self.words_completed = 0
-        # Очищаем экран при переходе на новый уровень
-        self.words = []
-        self.spawn_timer = 180  # Пауза 3 секунды перед началом нового уровня
-    
-    def draw(self, surface):
-        # Фон с звездами
-        surface.fill(BACKGROUND)
-        for star in self.background_stars:
-            brightness = int(star['brightness'] * 255)
-            pygame.draw.circle(surface, (brightness, brightness, brightness), 
-                             (int(star['x']), int(star['y'])), star['size'])
-        
-        # Падающие слова
-        for word in self.words:
-            word.draw(surface)
-        
-        # Панель информации
-        self.draw_info_panel(surface)
-        
-        # Экран паузы
-        if self.game_state == "paused":
-            self.draw_pause_screen(surface)
-        elif self.game_state == "game_over":
-            self.draw_game_over_screen(surface)
-        
-        # Анимация перехода уровня
-        if self.words_completed == 0 and self.level > 1 and self.spawn_timer > 60:
-            self.draw_level_transition(surface)
-    
-    def draw_info_panel(self, surface):
-        # Полупрозрачная панель
-        panel = pygame.Surface((WIDTH, 80), pygame.SRCALPHA)
-        panel.fill(PANEL_BG)
-        surface.blit(panel, (0, 0))
-        
-        # Счет
-        score_text = score_font.render(f"Счет: {self.score}", True, TEXT_COLOR)
-        surface.blit(score_text, (20, 20))
-        
-        # Уровень
-        level_text = score_font.render(f"Уровень: {self.level}", True, ACCENT)
-        surface.blit(level_text, (WIDTH//2 - level_text.get_width()//2, 20))
-        
-        # Жизни
-        lives_text = score_font.render(f"Жизни: {'♥' * self.lives}", True, ERROR)
-        surface.blit(lives_text, (WIDTH - 150, 20))
-        
-        # Прогресс уровня
-        progress = min(self.words_completed / 10, 1.0)
-        pygame.draw.rect(surface, (50, 50, 50), (WIDTH//2 - 100, 60, 200, 10))
-        pygame.draw.rect(surface, CORRECT, (WIDTH//2 - 100, 60, 200 * progress, 10))
-        
-        # Слова для повторения
-        if self.words_for_revision:
-            rev_text = small_font.render(f"Слов для повторения: {len(self.words_for_revision)}", True, ERROR)
-            surface.blit(rev_text, (WIDTH - 250, 55))
-    
-    def draw_pause_screen(self, surface):
-        overlay = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
-        overlay.fill((0, 0, 0, 180))
-        surface.blit(overlay, (0, 0))
-        
-        title = title_font.render("ПАУЗА", True, ACCENT)
-        surface.blit(title, (WIDTH//2 - title.get_width()//2, HEIGHT//2 - 100))
-        
-        # Список слов для повторения
-        if self.words_for_revision:
-            rev_title = score_font.render("Слова для повторения:", True, ERROR)
-            surface.blit(rev_title, (WIDTH//2 - rev_title.get_width()//2, HEIGHT//2 - 20))
-            
-            for i, word_data in enumerate(self.words_for_revision[:8]):
-                # Подсвечиваем правильные буквы зеленым
-                display_text = self.highlight_correct_letters(word_data)
-                word_surface = small_font.render(display_text, True, TEXT_COLOR)
-                surface.blit(word_surface, (WIDTH//2 - word_surface.get_width()//2, 
-                                          HEIGHT//2 + 20 + i * 30))
-        
-        hint = small_font.render("Нажмите P для продолжения", True, TEXT_COLOR)
-        surface.blit(hint, (WIDTH//2 - hint.get_width()//2, HEIGHT - 100))
-    
-    def highlight_correct_letters(self, word_data):
-        result = []
-        gap_index = 0
-        masked = word_data["masked"]
-        
-        i = 0
-        while i < len(masked):
-            if masked[i] == '.' or masked[i] == '…':
-                j = i
-                while j < len(masked) and (masked[j] == '.' or masked[j] == '…'):
-                    j += 1
-                
-                correct_letter = word_data["missing_letters"][gap_index]
-                result.append(f"[{correct_letter}]")
-                gap_index += 1
-                i = j
-            else:
-                result.append(masked[i])
-                i += 1
-        
-        return "".join(result)
-    
-    def draw_level_transition(self, surface):
-        overlay = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
-        overlay.fill((0, 0, 0, 150))
-        surface.blit(overlay, (0, 0))
-        
-        level_text = title_font.render(f"Уровень {self.level}", True, ACCENT)
-        surface.blit(level_text, (WIDTH//2 - level_text.get_width()//2, HEIGHT//2 - 50))
-        
-        # Случайные аффирмации для подростков
-        affirmations = [
-            "Твой мозг становится сильнее с каждым словом!",
-            "Грамотность - твой суперсила!",
-            "Каждая ошибка делает тебя умнее!",
-            "Ты создаешь свое успешное будущее!",
-            "Знания - твоя самая крутая инвестиция!",
-            "Ты становишься мастером слова!",
-            "Образование - ключ к твоим мечтам!"
-        ]
-        
-        aff_text = word_font.render(random.choice(affirmations), True, CORRECT)
-        surface.blit(aff_text, (WIDTH//2 - aff_text.get_width()//2, HEIGHT//2 + 30))
-    
-    def draw_game_over_screen(self, surface):
-        overlay = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
-        overlay.fill((0, 0, 0, 200))
-        surface.blit(overlay, (0, 0))
-        
-        game_over = title_font.render("ИГРА ОКОНЧЕНА", True, ERROR)
-        surface.blit(game_over, (WIDTH//2 - game_over.get_width()//2, HEIGHT//2 - 100))
-        
-        score_text = score_font.render(f"Финальный счет: {self.score}", True, ACCENT)
-        surface.blit(score_text, (WIDTH//2 - score_text.get_width()//2, HEIGHT//2 - 20))
-        
-        level_text = score_font.render(f"Достигнутый уровень: {self.level}", True, CORRECT)
-        surface.blit(level_text, (WIDTH//2 - level_text.get_width()//2, HEIGHT//2 + 20))
-        
-        restart = small_font.render("Нажмите R для перезапуска", True, TEXT_COLOR)
-        surface.blit(restart, (WIDTH//2 - restart.get_width()//2, HEIGHT - 100))
+            resizeCanvas() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            }
 
-def main():
-    game = Game()
-    clock = pygame.time.Clock()
-    
-    running = True
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    running = False
-                elif event.key == pygame.K_p:
-                    if game.game_state == "playing":
-                        game.game_state = "paused"
-                    elif game.game_state == "paused":
-                        game.game_state = "playing"
-                elif event.key == pygame.K_r and game.game_state == "game_over":
-                    game = Game()  # Перезапуск игры
-                
-                # Обработка буквенных клавиш
-                if event.unicode.isalpha() and len(event.unicode) == 1:
-                    game.handle_input(event.unicode)
-        
-        game.update()
-        game.draw(screen)
-        
-        pygame.display.flip()
-        clock.tick(60)
+            createStars() {
+                const stars = [];
+                for (let i = 0; i < 100; i++) {
+                    stars.push({
+                        x: Math.random() * this.canvas.width,
+                        y: Math.random() * this.canvas.height,
+                        size: Math.random() * 2 + 0.5,
+                        brightness: Math.random() * 0.7 + 0.3,
+                        speed: Math.random() * 0.2 + 0.1
+                    });
+                }
+                return stars;
+            }
 
-if __name__ == "__main__":
-    main()
-    pygame.quit()
-    sys.exit()
+            setupEventListeners() {
+                window.addEventListener('resize', () => this.resizeCanvas());
+                window.addEventListener('keydown', (e) => this.handleKeyPress(e));
+                
+                document.getElementById('pauseBtn').addEventListener('click', () => this.togglePause());
+                document.getElementById('resumeBtn').addEventListener('click', () => this.togglePause());
+                document.getElementById('restartBtn').addEventListener('click', () => this.restart());
+                document.getElementById('nextLevelBtn').addEventListener('click', () => this.nextLevel());
+                document.getElementById('playAgainBtn').addEventListener('click', () => this.restart());
+            }
+
+            handleKeyPress(e) {
+                if (this.gameState !== 'playing') return;
+                
+                if (e.key.length === 1 && e.key.match(/[а-яА-Яa-zA-Z]/)) {
+                    this.processInput(e.key.toLowerCase());
+                }
+            }
+
+            processInput(letter) {
+                for (let word of this.words) {
+                    if (!word.completed && !word.error) {
+                        if (word.processInput(letter)) {
+                            if (word.completed) {
+                                this.wordsCompleted++;
+                                this.score += 100 * this.level;
+                                this.updateUI();
+                                
+                                if (this.wordsCompleted >= 10) {
+                                    this.levelUp();
+                                }
+                            }
+                            return true;
+                        } else if (word.error) {
+                            this.addToRevision(word.originalData);
+                            return false;
+                        }
+                    }
+                }
+                return false;
+            }
+
+            addToRevision(wordData) {
+                if (!this.wordsForRevision.find(w => w.word === wordData.word)) {
+                    this.wordsForRevision.push(wordData);
+                    this.updateUI();
+                }
+            }
+
+            spawnWord() {
+                const availableWords = vocabulary.filter(word => 
+                    !this.wordsForRevision.find(rev => rev.word === word.word)
+                );
+                
+                const wordData = availableWords.length > 0 ? 
+                    availableWords[Math.floor(Math.random() * availableWords.length)] : 
+                    vocabulary[Math.floor(Math.random() * vocabulary.length)];
+                
+                const x = Math.random() * (this.canvas.width - 400) + 200;
+                const speed = Math.random() * 1 + 1 + this.level * 0.2;
+                
+                this.words.push(new FallingWord(wordData, x, -50, speed, this.ctx));
+            }
+
+            levelUp() {
+                this.level++;
+                this.wordsCompleted = 0;
+                this.words = [];
+                this.spawnTimer = 0;
+                
+                document.getElementById('newLevel').textContent = this.level;
+                document.getElementById('affirmation').textContent = 
+                    affirmations[Math.floor(Math.random() * affirmations.length)];
+                document.getElementById('levelScore').textContent = this.score;
+                
+                this.showScreen('levelUpScreen');
+                this.gameState = 'levelUp';
+            }
+
+            nextLevel() {
+                this.hideAllScreens();
+                this.gameState = 'playing';
+            }
+
+            togglePause() {
+                if (this.gameState === 'playing') {
+                    this.showPauseScreen();
+                    this.gameState = 'paused';
+                } else if (this.gameState === 'paused') {
+                    this.hideAllScreens();
+                    this.gameState = 'playing';
+                }
+            }
+
+            showPauseScreen() {
+                const revisionList = document.getElementById('revisionWords');
+                revisionList.innerHTML = '';
+                
+                this.wordsForRevision.forEach(wordData => {
+                    const div = document.createElement('div');
+                    div.className = 'word-item revision-word';
+                    div.innerHTML = this.highlightWord(wordData);
+                    revisionList.appendChild(div);
+                });
+                
+                this.showScreen('pauseScreen');
+            }
+
+            highlightWord(wordData) {
+                let result = '';
+                let gapIndex = 0;
+                
+                for (let i = 0; i < wordData.masked.length; i++) {
+                    if (wordData.masked[i] === '.' || wordData.masked[i] === '…') {
+                        const correctLetter = wordData.missing[gapIndex];
+                        result += `<span class="correct-letter">${correctLetter}</span>`;
+                        gapIndex++;
+                        
+                        // Пропускаем остальные точки в этом пропуске
+                        while (i < wordData.masked.length - 1 && 
+                              (wordData.masked[i + 1] === '.' || wordData.masked[i + 1] === '…')) {
+                            i++;
+                        }
+                    } else {
+                        result += wordData.masked[i];
+                    }
+                }
+                return result;
+            }
+
+            showScreen(screenId) {
+                document.querySelectorAll('#pauseScreen, #gameOverScreen, #levelUpScreen')
+                    .forEach(screen => screen.classList.add('hidden'));
+                document.getElementById(screenId).classList.remove('hidden');
+            }
+
+            hideAllScreens() {
+                document.querySelectorAll('#pauseScreen, #gameOverScreen, #levelUpScreen')
+                    .forEach(screen => screen.classList.add('hidden'));
+            }
+
+            restart() {
+                this.words = [];
+                this.score = 0;
+                this.lives = 3;
+                this.level = 1;
+                this.wordsCompleted = 0;
+                this.wordsForRevision = [];
+                this.gameState = 'playing';
+                this.spawnTimer = 0;
+                this.updateUI();
+                this.hideAllScreens();
+            }
+
+            update() {
+                if (this.gameState !== 'playing') return;
+
+                // Обновляем слова
+                this.words = this.words.filter(word => word.update());
+                
+                // Спавн новых слов
+                this.spawnTimer--;
+                if (this.spawnTimer <= 0) {
+                    this.spawnWord();
+                    this.spawnTimer = Math.random() * 60 + 60; // 1-2 секунды
+                }
+                
+                // Проверка проигрыша
+                const bottomWords = this.words.filter(word => 
+                    word.y > this.canvas.height - 100 && !word.completed
+                );
+                
+                if (bottomWords.length > 5) {
+                    this.lives--;
+                    this.updateUI();
+                    
+                    // Удаляем несколько слов снизу
+                    bottomWords.slice(0, 2).forEach(word => {
+                        const index = this.words.indexOf(word);
+                        if (index > -1) {
+                            this.words.splice(index, 1);
+                        }
+                    });
+                    
+                    if (this.lives <= 0) {
+                        this.gameOver();
+                    }
+                }
+                
+                // Обновляем частицы
+                this.particles = this.particles.filter(particle => particle.update());
+            }
+
+            gameOver() {
+                document.getElementById('finalScore').textContent = this.score;
+                document.getElementById('finalLevel').textContent = this.level;
+                document.getElementById('totalWords').textContent = this.wordsCompleted;
+                this.showScreen('gameOverScreen');
+                this.gameState = 'gameOver';
+            }
+
+            updateUI() {
+                document.getElementById('score').textContent = this.score;
+                document.getElementById('lives').textContent = this.lives;
+                document.getElementById('level').textContent = this.level;
+                document.getElementById('wordsCompleted').textContent = this.wordsCompleted;
+                document.getElementById('revisionCount').textContent = this.wordsForRevision.length;
+                
+                const progress = (this.wordsCompleted / 10) * 100;
+                document.getElementById('levelProgress').style.width = progress + '%';
+            }
+
+            createParticles(x, y, color, count) {
+                for (let i = 0; i < count; i++) {
+                    this.particles.push(new Particle(x, y, color, this.ctx));
+                }
+            }
+
+            draw() {
+                // Очистка canvas
+                this.ctx.fillStyle = '#0a141e';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                // Рисуем звезды
+                this.drawStars();
+                
+                // Рисуем слова
+                this.words.forEach(word => word.draw());
+                
+                // Рисуем частицы
+                this.particles.forEach(particle => particle.draw());
+            }
+
+            drawStars() {
+                this.stars.forEach(star => {
+                    this.ctx.fillStyle = `rgba(255, 255, 255, ${star.brightness})`;
+                    this.ctx.beginPath();
+                    this.ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                    this.ctx.fill();
+                    
+                    // Анимация звезд
+                    star.y += star.speed;
+                    if (star.y > this.canvas.height) {
+                        star.y = 0;
+                        star.x = Math.random() * this.canvas.width;
+                    }
+                });
+            }
+
+            gameLoop() {
+                this.update();
+                this.draw();
+                this.updateUI();
+                requestAnimationFrame(() => this.gameLoop());
+            }
+        }
+
+        class FallingWord {
+            constructor(wordData, x, y, speed, ctx) {
+                this.originalData = wordData;
+                this.word = wordData.word;
+                this.masked = wordData.masked;
+                this.missingLetters = [...wordData.missing];
+                this.x = x;
+                this.y = y;
+                this.speed = speed;
+                this.ctx = ctx;
+                this.currentGap = 0;
+                this.correctlyFilled = [];
+                this.error = null;
+                this.errorTimer = 0;
+                this.completed = false;
+                this.completionTimer = 1.0;
+                this.particles = [];
+            }
+
+            update() {
+                if (!this.completed) {
+                    this.y += this.speed;
+                }
+
+                if (this.error) {
+                    this.errorTimer -= 0.016;
+                    if (this.errorTimer <= 0) {
+                        this.error = null;
+                    }
+                }
+
+                if (this.completed) {
+                    this.completionTimer -= 0.03;
+                    this.particles = this.particles.filter(p => p.update());
+                    return this.completionTimer > 0;
+                }
+
+                return this.y < this.ctx.canvas.height + 100;
+            }
+
+            processInput(letter) {
+                if (this.completed || this.error) return false;
+
+                const correctLetter = this.missingLetters[this.currentGap];
+                
+                if (letter === correctLetter) {
+                    this.correctlyFilled.push(letter);
+                    this.currentGap++;
+                    
+                    if (this.currentGap >= this.missingLetters.length) {
+                        this.completed = true;
+                        // Создаем частицы для анимации завершения
+                        for (let i = 0; i < 20; i++) {
+                            this.particles.push(new Particle(
+                                this.x, this.y, '#2ecc71', this.ctx
+                            ));
+                        }
+                    }
+                    return true;
+                } else {
+                    this.error = letter;
+                    this.errorTimer = 1.0;
+                    return false;
+                }
+            }
+
+            draw() {
+                if (this.completed) {
+                    this.drawCompleted();
+                } else {
+                    this.drawWord();
+                }
+                this.particles.forEach(particle => particle.draw());
+            }
+
+            drawWord() {
+                const displayText = this.getDisplayText();
+                const color = this.error ? '#e74c3c' : '#ecf0f1';
+                
+                this.ctx.font = '28px Arial';
+                this.ctx.fillStyle = color;
+                this.ctx.textAlign = 'center';
+                this.ctx.fillText(displayText, this.x, this.y);
+            }
+
+            drawCompleted() {
+                const scale = 1.0 + (1.0 - this.completionTimer) * 0.5;
+                const alpha = this.completionTimer;
+                
+                this.ctx.save();
+                this.ctx.font = `bold ${28 * scale}px Arial`;
+                this.ctx.fillStyle = `rgba(46, 204, 113, ${alpha})`;
+                this.ctx.textAlign = 'center';
+                this.ctx.fillText(this.word, this.x, this.y);
+                this.ctx.restore();
+            }
+
+            getDisplayText() {
+                if (this.error) {
+                    return this.getErrorText();
+                }
+                
+                let result = '';
+                let gapIndex = 0;
+                let i = 0;
+                
+                while (i < this.masked.length) {
+                    if (this.masked[i] === '.' || this.masked[i] === '…') {
+                        const gapLength = this.getGapLength(i);
+                        
+                        if (gapIndex < this.currentGap) {
+                            // Уже заполненный пропуск
+                            result += this.correctlyFilled[gapIndex];
+                        } else if (gapIndex === this.currentGap) {
+                            // Активный пропуск
+                            result += '[ _ ]';
+                        } else {
+                            // Будущий пропуск
+                            result += '_'.repeat(gapLength);
+                        }
+                        
+                        gapIndex++;
+                        i += gapLength;
+                    } else {
+                        result += this.masked[i];
+                        i++;
+                    }
+                }
+                
+                return result;
+            }
+
+            getErrorText() {
+                let result = '';
+                let gapIndex = 0;
+                let i = 0;
+                
+                while (i < this.masked.length) {
+                    if (this.masked[i] === '.' || this.masked[i] === '…') {
+                        const gapLength = this.getGapLength(i);
+                        
+                        if (gapIndex < this.currentGap) {
+                            result += this.correctlyFilled[gapIndex];
+                        } else if (gapIndex === this.currentGap) {
+                            // Показываем ошибку
+                            result += `[ ${this.error} ]`;
+                        } else {
+                            result += '_'.repeat(gapLength);
+                        }
+                        
+                        gapIndex++;
+                        i += gapLength;
+                    } else {
+                        result += this.masked[i];
+                        i++;
+                    }
+                }
+                
+                return result;
+            }
+
+            getGapLength(startIndex) {
+                let length = 0;
+                while (startIndex + length < this.masked.length && 
+                      (this.masked[startIndex + length] === '.' || 
+                       this.masked[startIndex + length] === '…')) {
+                    length++;
+                }
+                return length;
+            }
+        }
+
+        class Particle {
+            constructor(x, y, color, ctx) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.size = Math.random() * 3 + 1;
+                this.speedX = Math.random() * 6 - 3;
+                this.speedY = Math.random() * 6 - 3;
+                this.life = 1.0;
+                this.ctx = ctx;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.life -= 0.02;
+                this.size -= 0.05;
+                return this.life > 0 && this.size > 0;
+            }
+
+            draw() {
+                this.ctx.save();
+                this.ctx.globalAlpha = this.life;
+                this.ctx.fillStyle = this.color;
+                this.ctx.beginPath();
+                this.ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                this.ctx.fill();
+                this.ctx.restore();
+            }
+        }
+
+        // Создаем звезды для фона
+        function createBackgroundStars() {
+            const starsContainer = document.getElementById('stars');
+            for (let i = 0; i < 50; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.cssText = `
+                    position: absolute;
+                    background: white;
+                    border-radius: 50%;
+                    width: ${Math.random() * 2 + 1}px;
+                    height: ${Math.random() * 2 + 1}px;
+                    left: ${Math.random() * 100}%;
+                    top: ${Math.random() * 100}%;
+                    animation: twinkle ${Math.random() * 3 + 2}s infinite;
+                `;
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // Запуск игры при загрузке страницы
+        window.addEventListener('load', () => {
+            createBackgroundStars();
+            new Game();
+        });
+    </script>
+</body>
+</html>
 ```
