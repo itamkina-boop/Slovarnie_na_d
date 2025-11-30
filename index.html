@@ -17,6 +17,7 @@
             color: #ecf0f1;
             overflow: hidden;
             user-select: none;
+            touch-action: manipulation;
         }
 
         #gameContainer {
@@ -116,6 +117,66 @@
             transform: translateX(-50%);
         }
 
+        /* Мобильная клавиатура */
+        #mobileKeyboard {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(30, 40, 50, 0.95);
+            padding: 15px;
+            display: none;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 8px;
+            z-index: 1000;
+            border-top: 3px solid #87CEEB;
+        }
+
+        .key {
+            background: #87CEEB;
+            color: white;
+            border: none;
+            padding: 12px 5px;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .key:active {
+            background: #4682B4;
+            transform: scale(0.95);
+        }
+
+        /* Увеличенное слово для мобильных */
+        #zoomedWord {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(30, 40, 50, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            border: 3px solid #87CEEB;
+            font-size: 32px;
+            text-align: center;
+            z-index: 999;
+            display: none;
+            min-width: 300px;
+        }
+
+        #zoomedWord .word-text {
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        #zoomedWord .hint {
+            font-size: 16px;
+            color: #87CEEB;
+            margin-top: 10px;
+        }
+
         #pauseScreen, #gameOverScreen, #levelUpScreen {
             position: absolute;
             top: 0;
@@ -178,6 +239,18 @@
             font-weight: bold;
         }
 
+        .current-gap {
+            background: rgba(255, 255, 0, 0.3);
+            padding: 2px 4px;
+            border-radius: 3px;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { background: rgba(255, 255, 0, 0.3); }
+            50% { background: rgba(255, 255, 0, 0.6); }
+        }
+
         .stats {
             font-size: 1.2em;
             margin: 10px 0;
@@ -197,23 +270,78 @@
             display: none !important;
         }
 
-        .snowflake {
-            position: absolute;
-            color: #87CEEB;
-            font-size: 20px;
-            pointer-events: none;
-            user-select: none;
-        }
-
-        @keyframes fall {
-            to {
-                transform: translateY(100vh) rotate(360deg);
+        /* Мобильная адаптация */
+        @media (max-width: 768px) {
+            .panel {
+                padding: 10px 15px;
+                margin: 10px;
+                font-size: 14px;
+            }
+            
+            #scorePanel {
+                top: 10px;
+                left: 10px;
+            }
+            
+            #levelPanel {
+                top: 10px;
+                right: 10px;
+            }
+            
+            #progressPanel {
+                bottom: 80px;
+                min-width: 250px;
+            }
+            
+            #pauseBtn {
+                top: 10px;
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+            
+            .btn {
+                padding: 15px 20px;
+                font-size: 16px;
+                margin: 8px;
+            }
+            
+            .screen-content {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            /* Клавиатура для мобильных */
+            #mobileKeyboard {
+                display: grid;
+            }
+            
+            .key {
+                padding: 15px 5px;
+                font-size: 20px;
             }
         }
 
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
+        @media (max-width: 480px) {
+            #mobileKeyboard {
+                grid-template-columns: repeat(8, 1fr);
+                gap: 5px;
+                padding: 10px;
+            }
+            
+            .key {
+                padding: 12px 3px;
+                font-size: 18px;
+            }
+            
+            #zoomedWord {
+                font-size: 28px;
+                padding: 20px;
+                min-width: 280px;
+            }
         }
     </style>
 </head>
@@ -241,6 +369,17 @@
                     <div id="levelProgress" class="progress-fill" style="width: 0%"></div>
                 </div>
             </div>
+        </div>
+
+        <!-- Мобильная клавиатура -->
+        <div id="mobileKeyboard">
+            <!-- Клавиши будут добавлены через JavaScript -->
+        </div>
+
+        <!-- Увеличенное слово для мобильных -->
+        <div id="zoomedWord" class="hidden">
+            <div class="word-text" id="zoomedWordText"></div>
+            <div class="hint">Нажмите на букву ниже</div>
         </div>
 
         <!-- Экран паузы -->
@@ -284,32 +423,32 @@
     <script>
         // Словарь слов
         const vocabulary = [
-            {word: "дебаты", masked: "д..баты", missing: ["е", "а"]},
-            {word: "декларация", masked: "д..кл..рация", missing: ["е", "а", "а"]},
-            {word: "декорация", masked: "д..корация", missing: ["е", "о"]},
-            {word: "декоративный", masked: "д..коративный", missing: ["е", "о"]},
-            {word: "деликатес", masked: "д..л..к..тес", missing: ["е", "и", "а", "е"]},
-            {word: "деликатный", masked: "д..л..катный", missing: ["е", "и", "а"]},
-            {word: "демократ", masked: "д..м..крат", missing: ["е", "о", "а"]},
-            {word: "демократичный", masked: "д..м..кратичный", missing: ["е", "о", "а"]},
-            {word: "демонстрировать", masked: "д..м..нстрировать", missing: ["е", "о", "и"]},
-            {word: "демонстрация", masked: "д..м..нстрация", missing: ["е", "о", "а"]},
-            {word: "диалог", masked: "д..алог", missing: ["и", "а"]},
-            {word: "диалоговый", masked: "д..алоговый", missing: ["и", "а"]},
-            {word: "диалогический", masked: "д..алогический", missing: ["и", "а"]},
-            {word: "диапазон", masked: "д….пазон", missing: ["и", "а", "а"]},
-            {word: "динамика", masked: "д.намика", missing: ["и", "а"]},
-            {word: "динамический", masked: "д.намический", missing: ["и", "а"]},
-            {word: "динамичный", masked: "д.намичный", missing: ["и", "а"]},
-            {word: "дирижер", masked: "д..р..жёр", missing: ["и", "и", "ё"]},
-            {word: "дирижировать", masked: "д..р..жировать", missing: ["и", "и", "и"]},
-            {word: "диспетчер", masked: "д..спетчер", missing: ["и", "е"]},
-            {word: "диспетчерский", masked: "д..спетчерский", missing: ["и", "е"]},
-            {word: "дистанция", masked: "д..станция", missing: ["и", "а"]},
-            {word: "дистанционный", masked: "д..станционный", missing: ["и", "а"]},
-            {word: "дисциплина", masked: "д..сциплина", missing: ["и", "и"]},
-            {word: "дисциплинарный", masked: "д..сциплинарный", missing: ["и", "и", "а"]},
-            {word: "дисциплинировать", masked: "д..сциплинировать", missing: ["и", "и", "и"]}
+            {word: "дебаты", masked: "д_баты", missing: ["е"]},
+            {word: "декларация", masked: "д_кларация", missing: ["е"]},
+            {word: "декорация", masked: "д_корация", missing: ["е"]},
+            {word: "декоративный", masked: "д_коративный", missing: ["е"]},
+            {word: "деликатес", masked: "д_ликатес", missing: ["е"]},
+            {word: "деликатный", masked: "д_ликатный", missing: ["е"]},
+            {word: "демократ", masked: "д_мократ", missing: ["е"]},
+            {word: "демократичный", masked: "д_мократичный", missing: ["е"]},
+            {word: "демонстрировать", masked: "д_монстрировать", missing: ["е"]},
+            {word: "демонстрация", masked: "д_монстрация", missing: ["е"]},
+            {word: "диалог", masked: "д_алог", missing: ["и"]},
+            {word: "диалоговый", masked: "д_алоговый", missing: ["и"]},
+            {word: "диалогический", masked: "д_алогический", missing: ["и"]},
+            {word: "диапазон", masked: "д_апазон", missing: ["и"]},
+            {word: "динамика", masked: "д_намика", missing: ["и"]},
+            {word: "динамический", masked: "д_намический", missing: ["и"]},
+            {word: "динамичный", masked: "д_намичный", missing: ["и"]},
+            {word: "дирижер", masked: "д_рижер", missing: ["и"]},
+            {word: "дирижировать", masked: "д_рижировать", missing: ["и"]},
+            {word: "диспетчер", masked: "д_спетчер", missing: ["и"]},
+            {word: "диспетчерский", masked: "д_спетчерский", missing: ["и"]},
+            {word: "дистанция", masked: "д_станция", missing: ["и"]},
+            {word: "дистанционный", masked: "д_станционный", missing: ["и"]},
+            {word: "дисциплина", masked: "д_сциплина", missing: ["и"]},
+            {word: "дисциплинарный", masked: "д_сциплинарный", missing: ["и"]},
+            {word: "дисциплинировать", masked: "д_сциплинировать", missing: ["и"]}
         ];
 
         // Аффирмации для перехода уровней
@@ -320,6 +459,11 @@
             "Зимняя буря грамотности под твоей властью! ⛄",
             "Твои знания сверкают как снег на солнце! ☀️"
         ];
+
+        // Буквы для клавиатуры
+        const keyboardLetters = ['а', 'б', 'в', 'г', 'д', 'е', 'ё', 'ж', 'з', 'и', 
+                               'й', 'к', 'л', 'м', 'н', 'о', 'п', 'р', 'с', 'т', 
+                               'у', 'ф', 'х', 'ц', 'ч', 'ш', 'щ', 'ъ', 'ы', 'ь', 'э', 'ю', 'я'];
 
         class Game {
             constructor() {
@@ -335,13 +479,22 @@
                 this.wordsCompleted = 0;
                 this.wordsForRevision = [];
                 this.gameState = 'playing';
-                this.spawnTimer = 180; // 3 секунды до первого слова
+                this.spawnTimer = 180;
                 this.particles = [];
                 this.snowflakes = [];
+                this.isMobile = this.checkMobile();
+                this.selectedWord = null;
                 
                 this.setupEventListeners();
                 this.createBackgroundSnowflakes();
+                if (this.isMobile) {
+                    this.createMobileKeyboard();
+                }
                 this.gameLoop();
+            }
+
+            checkMobile() {
+                return window.innerWidth <= 768;
             }
 
             resizeCanvas() {
@@ -353,6 +506,13 @@
                 window.addEventListener('resize', () => this.resizeCanvas());
                 window.addEventListener('keydown', (e) => this.handleKeyPress(e));
                 
+                // Тапы по снежинкам (для мобильных)
+                this.canvas.addEventListener('click', (e) => this.handleCanvasTap(e));
+                this.canvas.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    this.handleCanvasTap(e.touches[0]);
+                });
+                
                 document.getElementById('pauseBtn').addEventListener('click', () => this.togglePause());
                 document.getElementById('resumeBtn').addEventListener('click', () => this.togglePause());
                 document.getElementById('restartBtn').addEventListener('click', () => this.restart());
@@ -360,17 +520,87 @@
                 document.getElementById('playAgainBtn').addEventListener('click', () => this.restart());
             }
 
-            createBackgroundSnowflakes() {
-                // Создаем декоративные снежинки на заднем плане
-                for (let i = 0; i < 30; i++) {
-                    this.snowflakes.push({
-                        x: Math.random() * this.canvas.width,
-                        y: Math.random() * this.canvas.height,
-                        size: Math.random() * 2 + 1,
-                        speed: Math.random() * 0.5 + 0.2,
-                        opacity: Math.random() * 0.3 + 0.1
-                    });
+            createMobileKeyboard() {
+                const keyboard = document.getElementById('mobileKeyboard');
+                keyboard.innerHTML = '';
+                
+                // Только нужные буквы для текущих слов
+                const neededLetters = this.getNeededLetters();
+                
+                neededLetters.forEach(letter => {
+                    const key = document.createElement('button');
+                    key.className = 'key';
+                    key.textContent = letter;
+                    key.addEventListener('click', () => this.processInput(letter));
+                    keyboard.appendChild(key);
+                });
+            }
+
+            getNeededLetters() {
+                // Все буквы, которые могут понадобиться в словах
+                const allMissingLetters = [...new Set(vocabulary.flatMap(word => word.missing))];
+                return allMissingLetters.sort();
+            }
+
+            handleCanvasTap(event) {
+                if (this.gameState !== 'playing') return;
+                
+                const rect = this.canvas.getBoundingClientRect();
+                const x = event.clientX - rect.left;
+                const y = event.clientY - rect.top;
+                
+                // Ищем слово, по которому тапнули
+                const tappedWord = this.words.find(word => 
+                    !word.completed && 
+                    Math.abs(word.x - x) < 60 && 
+                    Math.abs(word.y - y) < 60
+                );
+                
+                if (tappedWord) {
+                    this.selectWord(tappedWord);
                 }
+            }
+
+            selectWord(word) {
+                this.selectedWord = word;
+                this.showZoomedWord(word);
+            }
+
+            showZoomedWord(word) {
+                const zoomedElement = document.getElementById('zoomedWord');
+                const textElement = document.getElementById('zoomedWordText');
+                
+                textElement.innerHTML = this.createZoomedDisplayText(word);
+                zoomedElement.classList.remove('hidden');
+            }
+
+            hideZoomedWord() {
+                document.getElementById('zoomedWord').classList.add('hidden');
+                this.selectedWord = null;
+            }
+
+            createZoomedDisplayText(word) {
+                let result = '';
+                let gapIndex = 0;
+                
+                for (let i = 0; i < word.masked.length; i++) {
+                    if (word.masked[i] === '_') {
+                        if (gapIndex < word.currentGap) {
+                            // Заполненная буква - зеленая
+                            result += `<span style="color: #2ecc71; font-weight: bold;">${word.correctlyFilled[gapIndex]}</span>`;
+                        } else if (gapIndex === word.currentGap) {
+                            // Текущий пропуск - желтый
+                            result += `<span class="current-gap">_</span>`;
+                        } else {
+                            // Будущий пропуск
+                            result += '_';
+                        }
+                        gapIndex++;
+                    } else {
+                        result += word.masked[i];
+                    }
+                }
+                return result;
             }
 
             handleKeyPress(e) {
@@ -382,32 +612,42 @@
             }
 
             processInput(letter) {
-                // Ищем активное падающее слово (первое не завершенное)
-                const activeWord = this.words.find(word => !word.completed && !word.error);
+                let targetWord = this.selectedWord || this.words.find(word => !word.completed && !word.error);
                 
-                if (activeWord) {
-                    if (activeWord.processInput(letter)) {
-                        if (activeWord.completed) {
+                if (targetWord) {
+                    if (targetWord.processInput(letter)) {
+                        if (targetWord.completed) {
                             this.wordsCompleted++;
                             this.score += 100 * this.level;
-                            this.createSnowExplosion(activeWord.x, activeWord.y, 15);
+                            this.createSnowExplosion(targetWord.x, targetWord.y, 15);
+                            this.words = this.words.filter(w => w !== targetWord);
                             
-                            // Удаляем завершенное слово
-                            this.words = this.words.filter(w => w !== activeWord);
+                            if (this.isMobile) {
+                                this.hideZoomedWord();
+                            }
                             
                             if (this.wordsCompleted >= 8) {
                                 this.levelUp();
                             }
+                        } else if (this.isMobile) {
+                            // Обновляем увеличенное слово
+                            this.showZoomedWord(targetWord);
                         }
                         return true;
                     } else {
                         // Ошибка - слово попадает в повторение
-                        this.addToRevision(activeWord.originalData);
+                        this.addToRevision(targetWord.originalData);
+                        if (this.isMobile) {
+                            this.showZoomedWord(targetWord);
+                        }
                         return false;
                     }
                 }
                 return false;
             }
+
+            // ... остальные методы остаются такими же, как в предыдущем коде ...
+            // (spawnWord, levelUp, createFireworks, togglePause, update, draw и т.д.)
 
             addToRevision(wordData) {
                 if (!this.wordsForRevision.find(w => w.word === wordData.word)) {
@@ -417,7 +657,7 @@
             }
 
             spawnWord() {
-                if (this.words.length > 0) return; // Только одно слово одновременно
+                if (this.words.length > 0) return;
                 
                 const availableWords = vocabulary.filter(word => 
                     !this.wordsForRevision.find(rev => rev.word === word.word)
@@ -440,7 +680,6 @@
                 this.stoppedWords = [];
                 this.spawnTimer = 180;
                 
-                // Создаем фейерверк из снежинок
                 this.createFireworks();
                 
                 document.getElementById('newLevel').textContent = this.level;
@@ -502,15 +741,10 @@
                 let gapIndex = 0;
                 
                 for (let i = 0; i < wordData.masked.length; i++) {
-                    if (wordData.masked[i] === '.' || wordData.masked[i] === '…') {
+                    if (wordData.masked[i] === '_') {
                         const correctLetter = wordData.missing[gapIndex];
                         result += `<span class="correct-letter">${correctLetter}</span>`;
                         gapIndex++;
-                        
-                        while (i < wordData.masked.length - 1 && 
-                              (wordData.masked[i + 1] === '.' || wordData.masked[i + 1] === '…')) {
-                            i++;
-                        }
                     } else {
                         result += wordData.masked[i];
                     }
@@ -527,6 +761,7 @@
             hideAllScreens() {
                 document.querySelectorAll('#pauseScreen, #gameOverScreen, #levelUpScreen')
                     .forEach(screen => screen.classList.add('hidden'));
+                this.hideZoomedWord();
             }
 
             restart() {
@@ -539,6 +774,8 @@
                 this.wordsForRevision = [];
                 this.gameState = 'playing';
                 this.spawnTimer = 180;
+                this.selectedWord = null;
+                this.hideZoomedWord();
                 this.updateUI();
                 this.hideAllScreens();
             }
@@ -546,15 +783,17 @@
             update() {
                 if (this.gameState !== 'playing') return;
 
-                // Обновляем падающие слова
                 this.words.forEach(word => {
                     if (word.update()) {
-                        // Если слово достигло низа
                         if (word.y >= this.canvas.height - 50 && !word.completed) {
                             this.stoppedWords.push(word);
                             this.words = this.words.filter(w => w !== word);
                             this.lives--;
                             this.updateUI();
+                            
+                            if (this.isMobile && this.selectedWord === word) {
+                                this.hideZoomedWord();
+                            }
                             
                             if (this.lives <= 0) {
                                 this.gameOver();
@@ -563,7 +802,6 @@
                     }
                 });
                 
-                // Обновляем декоративные снежинки
                 this.snowflakes.forEach(flake => {
                     flake.y += flake.speed;
                     if (flake.y > this.canvas.height) {
@@ -572,14 +810,12 @@
                     }
                 });
                 
-                // Спавн новых слов
                 this.spawnTimer--;
                 if (this.spawnTimer <= 0 && this.words.length === 0) {
                     this.spawnWord();
-                    this.spawnTimer = Math.random() * 120 + 180; // 3-5 секунд
+                    this.spawnTimer = Math.random() * 120 + 180;
                 }
                 
-                // Обновляем частицы
                 this.particles = this.particles.filter(particle => particle.update());
             }
 
@@ -589,6 +825,7 @@
                 document.getElementById('totalWords').textContent = this.wordsCompleted;
                 this.showScreen('gameOverScreen');
                 this.gameState = 'gameOver';
+                this.hideZoomedWord();
             }
 
             updateUI() {
@@ -603,21 +840,28 @@
                 document.getElementById('levelProgress').style.width = progress + '%';
             }
 
+            createBackgroundSnowflakes() {
+                for (let i = 0; i < 30; i++) {
+                    this.snowflakes.push({
+                        x: Math.random() * this.canvas.width,
+                        y: Math.random() * this.canvas.height,
+                        size: Math.random() * 2 + 1,
+                        speed: Math.random() * 0.5 + 0.2,
+                        opacity: Math.random() * 0.3 + 0.1
+                    });
+                }
+            }
+
             draw() {
-                // Очистка canvas
                 this.ctx.fillStyle = '#0a141e';
                 this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
                 
-                // Рисуем декоративные снежинки
                 this.drawBackgroundSnowflakes();
                 
-                // Рисуем остановившиеся слова-снежинки
                 this.stoppedWords.forEach(word => word.drawStopped());
                 
-                // Рисуем падающие слова
                 this.words.forEach(word => word.draw());
                 
-                // Рисуем частицы
                 this.particles.forEach(particle => particle.draw());
             }
 
@@ -658,6 +902,44 @@
                 this.completed = false;
                 this.rotation = Math.random() * Math.PI * 2;
                 this.rotationSpeed = (Math.random() - 0.5) * 0.02;
+                
+                this.gapPositions = this.findGapPositions();
+            }
+
+            findGapPositions() {
+                const positions = [];
+                let i = 0;
+                
+                while (i < this.masked.length) {
+                    if (this.masked[i] === '_') {
+                        positions.push(i);
+                    }
+                    i++;
+                }
+                return positions;
+            }
+
+            processInput(letter) {
+                if (this.completed || this.error) return false;
+
+                if (this.currentGap < this.missingLetters.length) {
+                    const correctLetter = this.missingLetters[this.currentGap];
+                    
+                    if (letter === correctLetter) {
+                        this.correctlyFilled.push(letter);
+                        this.currentGap++;
+                        
+                        if (this.currentGap >= this.missingLetters.length) {
+                            this.completed = true;
+                        }
+                        return true;
+                    } else {
+                        this.error = letter;
+                        this.errorTimer = 1.5;
+                        return false;
+                    }
+                }
+                return false;
             }
 
             update() {
@@ -676,37 +958,12 @@
                 return true;
             }
 
-            processInput(letter) {
-                if (this.completed || this.error) return false;
-
-                const correctLetter = this.missingLetters[this.currentGap];
-                
-                if (letter === correctLetter) {
-                    // Правильная буква
-                    this.correctlyFilled.push(letter);
-                    this.currentGap++;
-                    
-                    if (this.currentGap >= this.missingLetters.length) {
-                        this.completed = true;
-                    }
-                    return true;
-                } else {
-                    // Неправильная буква
-                    this.error = letter;
-                    this.errorTimer = 1.5; // 1.5 секунды мигания
-                    return false;
-                }
-            }
-
             draw() {
                 this.ctx.save();
                 this.ctx.translate(this.x, this.y);
                 this.ctx.rotate(this.rotation);
                 
-                // Рисуем снежинку
                 this.drawSnowflakeShape();
-                
-                // Рисуем текст
                 this.drawWordText();
                 
                 this.ctx.restore();
@@ -716,10 +973,7 @@
                 this.ctx.save();
                 this.ctx.translate(this.x, this.y);
                 
-                // Рисуем снежинку (без вращения для остановившихся)
                 this.drawSnowflakeShape();
-                
-                // Рисуем текст
                 this.drawWordText();
                 
                 this.ctx.restore();
@@ -730,19 +984,19 @@
                 this.ctx.lineWidth = 2;
                 this.ctx.globalAlpha = 0.8;
                 
-                // Простая снежинка
+                // Увеличенная снежинка
                 for (let i = 0; i < 6; i++) {
                     this.ctx.rotate(Math.PI / 3);
                     this.ctx.beginPath();
                     this.ctx.moveTo(0, 0);
-                    this.ctx.lineTo(0, 30);
+                    this.ctx.lineTo(0, 45); // Увеличили с 30 до 45
                     this.ctx.stroke();
                     
                     this.ctx.beginPath();
-                    this.ctx.moveTo(0, 10);
-                    this.ctx.lineTo(-8, 15);
-                    this.ctx.moveTo(0, 10);
-                    this.ctx.lineTo(8, 15);
+                    this.ctx.moveTo(0, 15);
+                    this.ctx.lineTo(-12, 22);
+                    this.ctx.moveTo(0, 15);
+                    this.ctx.lineTo(12, 22);
                     this.ctx.stroke();
                 }
                 
@@ -751,18 +1005,16 @@
 
             drawWordText() {
                 const displayText = this.getDisplayText();
-                const fontSize = 14;
+                const fontSize = 18; // Увеличили с 14 до 18
                 
                 this.ctx.font = `bold ${fontSize}px Arial`;
                 this.ctx.textAlign = 'center';
                 this.ctx.textBaseline = 'middle';
                 
-                // Черная обводка для читаемости
                 this.ctx.strokeStyle = '#000';
-                this.ctx.lineWidth = 3;
+                this.ctx.lineWidth = 4;
                 this.ctx.strokeText(displayText, 0, 0);
                 
-                // Основной текст
                 this.ctx.fillStyle = '#FFFFFF';
                 this.ctx.fillText(displayText, 0, 0);
             }
@@ -774,28 +1026,19 @@
                 
                 let result = '';
                 let gapIndex = 0;
-                let i = 0;
                 
-                while (i < this.masked.length) {
-                    if (this.masked[i] === '.' || this.masked[i] === '…') {
-                        const gapLength = this.getGapLength(i);
-                        
+                for (let i = 0; i < this.masked.length; i++) {
+                    if (this.masked[i] === '_') {
                         if (gapIndex < this.currentGap) {
-                            // Уже заполненная буква - зеленый
-                            result += `{${this.correctlyFilled[gapIndex]}}`;
+                            result += this.correctlyFilled[gapIndex];
                         } else if (gapIndex === this.currentGap) {
-                            // Текущий пропуск - подсвечиваем
-                            result += `_`;
+                            result += "_";
                         } else {
-                            // Будущий пропуск
-                            result += '_'.repeat(gapLength);
+                            result += '_';
                         }
-                        
                         gapIndex++;
-                        i += gapLength;
                     } else {
                         result += this.masked[i];
-                        i++;
                     }
                 }
                 
@@ -805,44 +1048,27 @@
             getErrorText() {
                 let result = '';
                 let gapIndex = 0;
-                let i = 0;
                 
-                while (i < this.masked.length) {
-                    if (this.masked[i] === '.' || this.masked[i] === '…') {
-                        const gapLength = this.getGapLength(i);
-                        
+                for (let i = 0; i < this.masked.length; i++) {
+                    if (this.masked[i] === '_') {
                         if (gapIndex < this.currentGap) {
-                            result += `{${this.correctlyFilled[gapIndex]}}`;
+                            result += this.correctlyFilled[gapIndex];
                         } else if (gapIndex === this.currentGap) {
-                            // Мигающая красная ошибка
                             if (Math.floor(this.errorTimer * 10) % 2 === 0) {
-                                result += `[${this.error}]`;
+                                result += this.error;
                             } else {
                                 result += '_';
                             }
                         } else {
-                            result += '_'.repeat(gapLength);
+                            result += '_';
                         }
-                        
                         gapIndex++;
-                        i += gapLength;
                     } else {
                         result += this.masked[i];
-                        i++;
                     }
                 }
                 
                 return result;
-            }
-
-            getGapLength(startIndex) {
-                let length = 0;
-                while (startIndex + length < this.masked.length && 
-                      (this.masked[startIndex + length] === '.' || 
-                       this.masked[startIndex + length] === '…')) {
-                    length++;
-                }
-                return length;
             }
         }
 
@@ -874,7 +1100,6 @@
                 this.ctx.rotate(this.rotation);
                 this.ctx.globalAlpha = this.life;
                 
-                // Рисуем маленькую снежинку
                 this.ctx.strokeStyle = '#87CEEB';
                 this.ctx.lineWidth = 1;
                 
