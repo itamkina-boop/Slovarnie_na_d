@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Снежинки-слова - Игра</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Nunito:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -12,7 +13,7 @@
         }
 
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Nunito', sans-serif;
             background: linear-gradient(135deg, #0a141e 0%, #1a2a3a 100%);
             color: #ecf0f1;
             overflow: hidden;
@@ -43,11 +44,12 @@
         .panel {
             background: rgba(30, 40, 50, 0.9);
             padding: 15px 25px;
-            border-radius: 15px;
+            border-radius: 20px;
             border: 2px solid #87CEEB;
             margin: 20px;
             pointer-events: auto;
             backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
 
         #scorePanel {
@@ -72,49 +74,71 @@
             text-align: center;
         }
 
+        /* Исправляем расположение кнопок чтобы не перекрывались */
+        #pauseBtn {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        #dictionaryBtn {
+            position: absolute;
+            top: 20px;
+            left: calc(50% + 120px);
+        }
+
         .progress-bar {
             width: 100%;
-            height: 8px;
+            height: 10px;
             background: #34495e;
-            border-radius: 4px;
+            border-radius: 5px;
             margin-top: 10px;
             overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .progress-fill {
             height: 100%;
             background: linear-gradient(90deg, #87CEEB, #4682B4);
-            border-radius: 4px;
+            border-radius: 5px;
             transition: width 0.3s ease;
+            box-shadow: 0 0 10px rgba(135, 206, 235, 0.5);
         }
 
         .btn {
             background: linear-gradient(45deg, #87CEEB, #4682B4);
             color: white;
             border: none;
-            padding: 12px 24px;
+            padding: 14px 28px;
             border-radius: 25px;
+            font-family: 'Montserrat', sans-serif;
             font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
             pointer-events: auto;
             transition: all 0.3s ease;
-            margin: 5px;
+            margin: 8px;
+            box-shadow: 0 4px 15px rgba(135, 206, 235, 0.3);
         }
 
         .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(135, 206, 235, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(135, 206, 235, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
         }
 
         .btn-success {
             background: linear-gradient(45deg, #2ecc71, #27ae60);
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
         }
 
-        #pauseBtn {
-            position: absolute;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
+        .btn-danger {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
         }
 
         /* Мобильная клавиатура */
@@ -130,23 +154,28 @@
             gap: 8px;
             z-index: 1000;
             border-top: 3px solid #87CEEB;
+            backdrop-filter: blur(10px);
         }
 
         .key {
-            background: #87CEEB;
+            background: linear-gradient(45deg, #87CEEB, #4682B4);
             color: white;
             border: none;
-            padding: 12px 5px;
-            border-radius: 8px;
+            padding: 14px 8px;
+            border-radius: 12px;
+            font-family: 'Montserrat', sans-serif;
             font-size: 18px;
+            font-weight: 600;
             cursor: pointer;
             text-align: center;
             transition: all 0.2s ease;
+            box-shadow: 0 3px 8px rgba(135, 206, 235, 0.3);
         }
 
         .key:active {
             background: #4682B4;
             transform: scale(0.95);
+            box-shadow: 0 1px 4px rgba(135, 206, 235, 0.3);
         }
 
         /* Увеличенное слово для мобильных */
@@ -156,28 +185,75 @@
             left: 50%;
             transform: translate(-50%, -50%);
             background: rgba(30, 40, 50, 0.95);
-            padding: 30px;
-            border-radius: 20px;
+            padding: 35px;
+            border-radius: 25px;
             border: 3px solid #87CEEB;
-            font-size: 32px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 36px;
+            font-weight: 600;
             text-align: center;
             z-index: 999;
             display: none;
-            min-width: 300px;
+            min-width: 320px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
         }
 
         #zoomedWord .word-text {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             line-height: 1.4;
+            letter-spacing: 1px;
         }
 
         #zoomedWord .hint {
-            font-size: 16px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 18px;
             color: #87CEEB;
-            margin-top: 10px;
+            margin-top: 15px;
+            font-weight: 400;
         }
 
-        #pauseScreen, #gameOverScreen, #levelUpScreen {
+        /* Экран выбора режима */
+        #modeSelection {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+        }
+
+        .mode-card {
+            background: rgba(30, 40, 50, 0.95);
+            padding: 40px;
+            border-radius: 25px;
+            border: 3px solid #87CEEB;
+            text-align: center;
+            margin: 20px;
+            max-width: 500px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+        }
+
+        .mode-card h2 {
+            color: #87CEEB;
+            margin-bottom: 20px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 28px;
+        }
+
+        .mode-card p {
+            margin-bottom: 25px;
+            font-size: 18px;
+            line-height: 1.5;
+        }
+
+        #pauseScreen, #gameOverScreen, #levelUpScreen, #dictionaryScreen {
             position: absolute;
             top: 0;
             left: 0;
@@ -193,77 +269,99 @@
 
         .screen-content {
             background: rgba(30, 40, 50, 0.95);
-            padding: 40px;
-            border-radius: 20px;
+            padding: 45px;
+            border-radius: 25px;
             border: 3px solid #87CEEB;
             text-align: center;
-            max-width: 600px;
-            max-height: 80vh;
+            max-width: 700px;
+            max-height: 85vh;
             overflow-y: auto;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
         }
 
         h1 {
             color: #87CEEB;
-            font-size: 2.5em;
-            margin-bottom: 20px;
-            text-shadow: 0 0 10px rgba(135, 206, 235, 0.3);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 3em;
+            margin-bottom: 25px;
+            text-shadow: 0 0 15px rgba(135, 206, 235, 0.4);
         }
 
         h2 {
             color: #87CEEB;
-            margin-bottom: 15px;
+            font-family: 'Montserrat', sans-serif;
+            margin-bottom: 20px;
+            font-size: 2em;
         }
 
         .word-list {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 10px;
-            margin: 20px 0;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+            margin: 25px 0;
             text-align: left;
         }
 
         .word-item {
-            padding: 8px 12px;
+            padding: 12px 16px;
             background: rgba(52, 73, 94, 0.6);
-            border-radius: 5px;
-            border-left: 3px solid #87CEEB;
+            border-radius: 8px;
+            border-left: 4px solid #87CEEB;
+            font-family: 'Montserrat', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .word-item:hover {
+            transform: translateX(5px);
+            background: rgba(52, 73, 94, 0.8);
         }
 
         .revision-word {
             border-left-color: #e74c3c;
-            background: rgba(231, 76, 60, 0.1);
+            background: rgba(231, 76, 60, 0.15);
         }
 
         .correct-letter {
             color: #2ecc71;
             font-weight: bold;
+            text-shadow: 0 0 8px rgba(46, 204, 113, 0.5);
         }
 
         .current-gap {
-            background: rgba(255, 255, 0, 0.3);
-            padding: 2px 4px;
-            border-radius: 3px;
-            animation: pulse 1s infinite;
+            background: rgba(255, 255, 0, 0.4);
+            padding: 3px 6px;
+            border-radius: 4px;
+            animation: pulse 1.2s infinite;
+            font-weight: bold;
         }
 
         @keyframes pulse {
-            0%, 100% { background: rgba(255, 255, 0, 0.3); }
-            50% { background: rgba(255, 255, 0, 0.6); }
+            0%, 100% { 
+                background: rgba(255, 255, 0, 0.4);
+                box-shadow: 0 0 10px rgba(255, 255, 0, 0.3);
+            }
+            50% { 
+                background: rgba(255, 255, 0, 0.6);
+                box-shadow: 0 0 15px rgba(255, 255, 0, 0.5);
+            }
         }
 
         .stats {
-            font-size: 1.2em;
-            margin: 10px 0;
+            font-size: 1.3em;
+            margin: 15px 0;
+            font-family: 'Montserrat', sans-serif;
         }
 
         .affirmation {
-            font-size: 1.3em;
+            font-size: 1.4em;
             color: #87CEEB;
             font-style: italic;
-            margin: 20px 0;
-            padding: 15px;
+            margin: 25px 0;
+            padding: 20px;
             background: rgba(135, 206, 235, 0.1);
-            border-radius: 10px;
+            border-radius: 15px;
+            border-left: 4px solid #87CEEB;
         }
 
         .hidden {
@@ -273,45 +371,58 @@
         /* Мобильная адаптация */
         @media (max-width: 768px) {
             .panel {
-                padding: 10px 15px;
-                margin: 10px;
+                padding: 12px 18px;
+                margin: 15px;
                 font-size: 14px;
             }
             
             #scorePanel {
-                top: 10px;
-                left: 10px;
+                top: 15px;
+                left: 15px;
             }
             
             #levelPanel {
-                top: 10px;
-                right: 10px;
+                top: 15px;
+                right: 15px;
             }
             
             #progressPanel {
-                bottom: 80px;
-                min-width: 250px;
+                bottom: 90px;
+                min-width: 280px;
             }
             
             #pauseBtn {
-                top: 10px;
-                padding: 10px 20px;
+                top: 15px;
+                left: 50%;
+                transform: translateX(-50%);
+                padding: 12px 24px;
                 font-size: 14px;
             }
             
-            .btn {
-                padding: 15px 20px;
-                font-size: 16px;
-                margin: 8px;
+            #dictionaryBtn {
+                top: 80px;
+                left: 50%;
+                transform: translateX(-50%);
+                padding: 12px 24px;
             }
             
-            .screen-content {
-                padding: 20px;
+            .btn {
+                padding: 16px 24px;
+                font-size: 16px;
                 margin: 10px;
             }
             
+            .screen-content, .mode-card {
+                padding: 25px;
+                margin: 15px;
+            }
+            
             h1 {
-                font-size: 2em;
+                font-size: 2.2em;
+            }
+            
+            h2 {
+                font-size: 1.6em;
             }
             
             /* Клавиатура для мобильных */
@@ -320,28 +431,68 @@
             }
             
             .key {
-                padding: 15px 5px;
+                padding: 16px 6px;
                 font-size: 20px;
+            }
+            
+            #zoomedWord {
+                font-size: 30px;
+                padding: 25px;
+                min-width: 300px;
             }
         }
 
         @media (max-width: 480px) {
             #mobileKeyboard {
                 grid-template-columns: repeat(8, 1fr);
-                gap: 5px;
-                padding: 10px;
+                gap: 6px;
+                padding: 12px;
             }
             
             .key {
-                padding: 12px 3px;
+                padding: 14px 4px;
                 font-size: 18px;
             }
             
             #zoomedWord {
-                font-size: 28px;
+                font-size: 26px;
                 padding: 20px;
                 min-width: 280px;
             }
+            
+            .word-list {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .life {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .snowflake-count {
+            color: #87CEEB;
+            font-weight: bold;
+        }
+
+        /* Анимация исчезновения снежинки */
+        @keyframes snowflakeDisappear {
+            0% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.5) rotate(180deg);
+                opacity: 0.7;
+            }
+            100% {
+                transform: scale(0) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .snowflake-disappear {
+            animation: snowflakeDisappear 0.8s ease-out forwards;
         }
     </style>
 </head>
@@ -351,22 +502,45 @@
         
         <div id="uiOverlay">
             <div id="scorePanel" class="panel">
-                <div>❄️ Снежинок: <span id="snowflakeCount">0</span></div>
-                <div>❤️ Жизни: <span id="lives">3</span></div>
-                <div>⭐ Счет: <span id="score">0</span></div>
+                <div>❄️ Снежинок: <span id="snowflakeCount" class="snowflake-count">0</span></div>
+                <div>❤️ Жизни: <span id="lives" class="life">3</span></div>
+                <div>⭐ Уровень: <span id="level">1</span></div>
             </div>
             
             <div id="levelPanel" class="panel">
-                <div>🎯 Уровень: <span id="level">1</span></div>
-                <div>📝 Слов: <span id="wordsCompleted">0</span>/8</div>
+                <div>🎯 Режим: <span id="gameMode">Проверка</span></div>
+                <div>📝 Слов: <span id="wordsCompleted">0</span>/<span id="totalWords">8</span></div>
             </div>
             
             <button id="pauseBtn" class="btn">⏸️ Пауза</button>
+            <button id="dictionaryBtn" class="btn">📚 Словарь</button>
             
             <div id="progressPanel" class="panel">
                 <div>🔄 Для повторения: <span id="revisionCount">0</span></div>
                 <div class="progress-bar">
                     <div id="levelProgress" class="progress-fill" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Экран выбора режима -->
+        <div id="modeSelection">
+            <div class="screen-content">
+                <h1>❄️ Снежинки-слова</h1>
+                <p style="font-size: 1.2em; margin-bottom: 40px; color: #87CEEB;">Выберите режим игры</p>
+                
+                <div style="display: flex; gap: 30px; flex-wrap: wrap; justify-content: center;">
+                    <div class="mode-card">
+                        <h2>📚 Проверка знаний</h2>
+                        <p>Все слова из списка падают по одному. У вас 3 жизни. Жизнь тратится при ошибке или если снежинка упала.</p>
+                        <button id="knowledgeMode" class="btn btn-success">Играть</button>
+                    </div>
+                    
+                    <div class="mode-card">
+                        <h2>⚡ На скорость</h2>
+                        <p>Слова падают быстрее и по несколько сразу. Уровень растет каждые 8 слов. Проиграешь, если экран заполнится!</p>
+                        <button id="speedMode" class="btn btn-danger">Играть</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -386,10 +560,18 @@
         <div id="pauseScreen" class="hidden">
             <div class="screen-content">
                 <h1>⏸️ ПАУЗА</h1>
-                <h3>❄️ Слова-снежинки для повторения:</h3>
-                <div id="revisionWords" class="word-list"></div>
                 <button id="resumeBtn" class="btn btn-success">▶️ Продолжить</button>
                 <button id="restartBtn" class="btn">🔄 Начать заново</button>
+                <button id="changeModeBtn" class="btn">🎮 Сменить режим</button>
+            </div>
+        </div>
+
+        <!-- Словарь -->
+        <div id="dictionaryScreen" class="hidden">
+            <div class="screen-content">
+                <h1>📚 Словарь</h1>
+                <div id="dictionaryWords" class="word-list"></div>
+                <button id="closeDictionary" class="btn btn-success">Закрыть</button>
             </div>
         </div>
 
@@ -400,9 +582,9 @@
                 <div id="affirmation" class="affirmation"></div>
                 <div class="stats">
                     <div>❄️ Снежинок собрано: <span id="levelScore">0</span></div>
-                    <div>🎯 Точность: <span id="accuracy">100%</span></div>
+                    <div>🎯 Следующий уровень: <span id="nextLevelInfo"></span></div>
                 </div>
-                <button id="nextLevelBtn" class="btn btn-success">❄️ Следующий уровень</button>
+                <button id="nextLevelBtn" class="btn btn-success">❄️ Продолжить</button>
             </div>
         </div>
 
@@ -411,37 +593,38 @@
             <div class="screen-content">
                 <h1>💀 ИГРА ОКОНЧЕНА</h1>
                 <div class="stats">
-                    <div>⭐ Финальный счет: <span id="finalScore">0</span></div>
+                    <div>❄️ Снежинок собрано: <span id="finalSnowflakes">0</span></div>
                     <div>🎯 Уровень: <span id="finalLevel">1</span></div>
-                    <div>❄️ Снежинок собрано: <span id="totalWords">0</span></div>
+                    <div>📝 Всего слов: <span id="totalWordsCompleted">0</span></div>
                 </div>
                 <button id="playAgainBtn" class="btn btn-success">🔄 Играть снова</button>
+                <button id="changeModeGameOver" class="btn">🎮 Сменить режим</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Словарь слов
+        // Исправленный словарь слов
         const vocabulary = [
             {word: "дебаты", masked: "д_баты", missing: ["е"]},
-            {word: "декларация", masked: "д_кларация", missing: ["е"]},
+            {word: "декларация", masked: "д_кл_рация", missing: ["е", "а"]},
             {word: "декорация", masked: "д_корация", missing: ["е"]},
             {word: "декоративный", masked: "д_коративный", missing: ["е"]},
-            {word: "деликатес", masked: "д_ликатес", missing: ["е"]},
-            {word: "деликатный", masked: "д_ликатный", missing: ["е"]},
-            {word: "демократ", masked: "д_мократ", missing: ["е"]},
-            {word: "демократичный", masked: "д_мократичный", missing: ["е"]},
-            {word: "демонстрировать", masked: "д_монстрировать", missing: ["е"]},
-            {word: "демонстрация", masked: "д_монстрация", missing: ["е"]},
+            {word: "деликатес", masked: "д_л_к_тес", missing: ["е", "и", "а"]},
+            {word: "деликатный", masked: "д_л_катный", missing: ["е", "и"]},
+            {word: "демократ", masked: "д_м_крат", missing: ["е", "о"]},
+            {word: "демократичный", masked: "д_м_кратичный", missing: ["е", "о"]},
+            {word: "демонстрировать", masked: "д_м_нстрировать", missing: ["е", "о"]},
+            {word: "демонстрация", masked: "д_м_нстрация", missing: ["е", "о"]},
             {word: "диалог", masked: "д_алог", missing: ["и"]},
             {word: "диалоговый", masked: "д_алоговый", missing: ["и"]},
             {word: "диалогический", masked: "д_алогический", missing: ["и"]},
-            {word: "диапазон", masked: "д_апазон", missing: ["и"]},
+            {word: "диапазон", masked: "д__пазон", missing: ["и", "а"]},
             {word: "динамика", masked: "д_намика", missing: ["и"]},
             {word: "динамический", masked: "д_намический", missing: ["и"]},
             {word: "динамичный", masked: "д_намичный", missing: ["и"]},
-            {word: "дирижер", masked: "д_рижер", missing: ["и"]},
-            {word: "дирижировать", masked: "д_рижировать", missing: ["и"]},
+            {word: "дирижер", masked: "д_р_жёр", missing: ["и", "и"]},
+            {word: "дирижировать", masked: "д_р_жировать", missing: ["и", "и"]},
             {word: "диспетчер", masked: "д_спетчер", missing: ["и"]},
             {word: "диспетчерский", masked: "д_спетчерский", missing: ["и"]},
             {word: "дистанция", masked: "д_станция", missing: ["и"]},
@@ -460,11 +643,6 @@
             "Твои знания сверкают как снег на солнце! ☀️"
         ];
 
-        // Буквы для клавиатуры
-        const keyboardLetters = ['а', 'б', 'в', 'г', 'д', 'е', 'ё', 'ж', 'з', 'и', 
-                               'й', 'к', 'л', 'м', 'н', 'о', 'п', 'р', 'с', 'т', 
-                               'у', 'ф', 'х', 'ц', 'ч', 'ш', 'щ', 'ъ', 'ы', 'ь', 'э', 'ю', 'я'];
-
         class Game {
             constructor() {
                 this.canvas = document.getElementById('gameCanvas');
@@ -477,13 +655,19 @@
                 this.lives = 3;
                 this.level = 1;
                 this.wordsCompleted = 0;
+                this.totalWordsCompleted = 0;
                 this.wordsForRevision = [];
-                this.gameState = 'playing';
-                this.spawnTimer = 180;
+                this.learnedWords = new Set();
+                this.gameState = 'modeSelection';
+                this.gameMode = 'knowledge';
+                this.spawnTimer = 0;
                 this.particles = [];
                 this.snowflakes = [];
                 this.isMobile = this.checkMobile();
                 this.selectedWord = null;
+                this.maxWordsOnScreen = 1;
+                this.usedWords = new Set();
+                this.needClickSelection = false; // Нужно ли кликать на слова
                 
                 this.setupEventListeners();
                 this.createBackgroundSnowflakes();
@@ -506,25 +690,86 @@
                 window.addEventListener('resize', () => this.resizeCanvas());
                 window.addEventListener('keydown', (e) => this.handleKeyPress(e));
                 
-                // Тапы по снежинкам (для мобильных)
+                // Тапы по снежинкам (только в режиме скорости)
                 this.canvas.addEventListener('click', (e) => this.handleCanvasTap(e));
                 this.canvas.addEventListener('touchstart', (e) => {
                     e.preventDefault();
                     this.handleCanvasTap(e.touches[0]);
                 });
                 
+                // Кнопки управления
                 document.getElementById('pauseBtn').addEventListener('click', () => this.togglePause());
                 document.getElementById('resumeBtn').addEventListener('click', () => this.togglePause());
                 document.getElementById('restartBtn').addEventListener('click', () => this.restart());
                 document.getElementById('nextLevelBtn').addEventListener('click', () => this.nextLevel());
                 document.getElementById('playAgainBtn').addEventListener('click', () => this.restart());
+                document.getElementById('changeModeBtn').addEventListener('click', () => this.showModeSelection());
+                document.getElementById('changeModeGameOver').addEventListener('click', () => this.showModeSelection());
+                document.getElementById('knowledgeMode').addEventListener('click', () => this.startGame('knowledge'));
+                document.getElementById('speedMode').addEventListener('click', () => this.startGame('speed'));
+                document.getElementById('dictionaryBtn').addEventListener('click', () => this.showDictionary());
+                document.getElementById('closeDictionary').addEventListener('click', () => this.hideDictionary());
+            }
+
+            startGame(mode) {
+                this.gameMode = mode;
+                this.gameState = 'playing';
+                this.level = 1;
+                this.wordsCompleted = 0;
+                this.totalWordsCompleted = 0;
+                this.lives = 3;
+                this.words = [];
+                this.stoppedWords = [];
+                this.wordsForRevision = [];
+                this.learnedWords.clear();
+                this.usedWords.clear();
+                
+                // Настройки для разных режимов
+                if (mode === 'knowledge') {
+                    this.maxWordsOnScreen = 1;
+                    this.spawnTimer = 120;
+                    this.needClickSelection = false; // Не нужно кликать
+                } else {
+                    this.maxWordsOnScreen = 2; // С первого уровня 2 слова
+                    this.spawnTimer = 90;
+                    this.needClickSelection = true; // Нужно кликать
+                }
+                
+                document.getElementById('gameMode').textContent = mode === 'knowledge' ? 'Проверка' : 'Скорость';
+                document.getElementById('totalWords').textContent = mode === 'knowledge' ? vocabulary.length : '8';
+                document.getElementById('modeSelection').classList.add('hidden');
+                
+                this.updateUI();
+            }
+
+            showModeSelection() {
+                this.gameState = 'modeSelection';
+                this.hideAllScreens();
+                document.getElementById('modeSelection').classList.remove('hidden');
+            }
+
+            showDictionary() {
+                const dictionaryElement = document.getElementById('dictionaryWords');
+                dictionaryElement.innerHTML = '';
+                
+                vocabulary.forEach(wordData => {
+                    const div = document.createElement('div');
+                    div.className = `word-item ${this.learnedWords.has(wordData.word) ? '' : 'revision-word'}`;
+                    div.innerHTML = this.highlightWord(wordData);
+                    dictionaryElement.appendChild(div);
+                });
+                
+                this.showScreen('dictionaryScreen');
+            }
+
+            hideDictionary() {
+                document.getElementById('dictionaryScreen').classList.add('hidden');
             }
 
             createMobileKeyboard() {
                 const keyboard = document.getElementById('mobileKeyboard');
                 keyboard.innerHTML = '';
                 
-                // Только нужные буквы для текущих слов
                 const neededLetters = this.getNeededLetters();
                 
                 neededLetters.forEach(letter => {
@@ -537,13 +782,12 @@
             }
 
             getNeededLetters() {
-                // Все буквы, которые могут понадобиться в словах
                 const allMissingLetters = [...new Set(vocabulary.flatMap(word => word.missing))];
                 return allMissingLetters.sort();
             }
 
             handleCanvasTap(event) {
-                if (this.gameState !== 'playing') return;
+                if (this.gameState !== 'playing' || !this.needClickSelection) return;
                 
                 const rect = this.canvas.getBoundingClientRect();
                 const x = event.clientX - rect.left;
@@ -552,8 +796,8 @@
                 // Ищем слово, по которому тапнули
                 const tappedWord = this.words.find(word => 
                     !word.completed && 
-                    Math.abs(word.x - x) < 60 && 
-                    Math.abs(word.y - y) < 60
+                    Math.abs(word.x - x) < 80 && 
+                    Math.abs(word.y - y) < 80
                 );
                 
                 if (tappedWord) {
@@ -563,7 +807,9 @@
 
             selectWord(word) {
                 this.selectedWord = word;
-                this.showZoomedWord(word);
+                if (this.isMobile) {
+                    this.showZoomedWord(word);
+                }
             }
 
             showZoomedWord(word) {
@@ -586,13 +832,10 @@
                 for (let i = 0; i < word.masked.length; i++) {
                     if (word.masked[i] === '_') {
                         if (gapIndex < word.currentGap) {
-                            // Заполненная буква - зеленая
                             result += `<span style="color: #2ecc71; font-weight: bold;">${word.correctlyFilled[gapIndex]}</span>`;
                         } else if (gapIndex === word.currentGap) {
-                            // Текущий пропуск - желтый
                             result += `<span class="current-gap">_</span>`;
                         } else {
-                            // Будущий пропуск
                             result += '_';
                         }
                         gapIndex++;
@@ -612,65 +855,103 @@
             }
 
             processInput(letter) {
-                let targetWord = this.selectedWord || this.words.find(word => !word.completed && !word.error);
+                let targetWord;
+                
+                if (this.gameMode === 'knowledge') {
+                    // В режиме проверки всегда работаем с первым словом
+                    targetWord = this.words.find(word => !word.completed && !word.error);
+                } else {
+                    // В режиме скорости работаем с выбранным словом
+                    targetWord = this.selectedWord || this.words.find(word => !word.completed && !word.error);
+                }
                 
                 if (targetWord) {
                     if (targetWord.processInput(letter)) {
                         if (targetWord.completed) {
-                            this.wordsCompleted++;
-                            this.score += 100 * this.level;
-                            this.createSnowExplosion(targetWord.x, targetWord.y, 15);
-                            this.words = this.words.filter(w => w !== targetWord);
-                            
-                            if (this.isMobile) {
-                                this.hideZoomedWord();
-                            }
-                            
-                            if (this.wordsCompleted >= 8) {
-                                this.levelUp();
-                            }
-                        } else if (this.isMobile) {
-                            // Обновляем увеличенное слово
+                            this.handleWordCompleted(targetWord);
+                        } else if (this.isMobile && this.needClickSelection) {
                             this.showZoomedWord(targetWord);
                         }
                         return true;
                     } else {
-                        // Ошибка - слово попадает в повторение
-                        this.addToRevision(targetWord.originalData);
-                        if (this.isMobile) {
-                            this.showZoomedWord(targetWord);
-                        }
+                        this.handleWordError(targetWord);
                         return false;
                     }
                 }
                 return false;
             }
 
-            // ... остальные методы остаются такими же, как в предыдущем коде ...
-            // (spawnWord, levelUp, createFireworks, togglePause, update, draw и т.д.)
-
-            addToRevision(wordData) {
-                if (!this.wordsForRevision.find(w => w.word === wordData.word)) {
-                    this.wordsForRevision.push(wordData);
+            handleWordCompleted(word) {
+                // Запускаем анимацию исчезновения
+                word.startDisappearAnimation();
+                
+                setTimeout(() => {
+                    this.wordsCompleted++;
+                    this.totalWordsCompleted++;
+                    this.learnedWords.add(word.originalData.word);
+                    this.words = this.words.filter(w => w !== word);
+                    
+                    if (this.isMobile && this.needClickSelection) {
+                        this.hideZoomedWord();
+                    }
+                    
+                    // Проверка завершения уровня/игры
+                    if (this.gameMode === 'knowledge') {
+                        if (this.wordsCompleted >= vocabulary.length) {
+                            this.gameOver(true);
+                        }
+                    } else {
+                        if (this.wordsCompleted >= 8) {
+                            this.levelUp();
+                        }
+                    }
+                    
                     this.updateUI();
+                }, 500); // Ждем окончания анимации
+            }
+
+            handleWordError(word) {
+                this.wordsForRevision.push(word.originalData);
+                if (this.gameMode === 'knowledge') {
+                    this.lives--;
+                    if (this.lives <= 0) {
+                        this.gameOver(false);
+                    }
                 }
+                if (this.isMobile && this.needClickSelection) {
+                    this.showZoomedWord(word);
+                }
+                this.updateUI();
             }
 
             spawnWord() {
-                if (this.words.length > 0) return;
+                if (this.words.length >= this.maxWordsOnScreen) return;
                 
-                const availableWords = vocabulary.filter(word => 
-                    !this.wordsForRevision.find(rev => rev.word === word.word)
-                );
+                let availableWords;
+                if (this.gameMode === 'knowledge') {
+                    availableWords = vocabulary.filter(word => !this.usedWords.has(word.word));
+                    if (availableWords.length === 0) {
+                        this.usedWords.clear();
+                        availableWords = vocabulary;
+                    }
+                } else {
+                    availableWords = vocabulary;
+                }
                 
-                const wordData = availableWords.length > 0 ? 
-                    availableWords[Math.floor(Math.random() * availableWords.length)] : 
-                    vocabulary[Math.floor(Math.random() * vocabulary.length)];
+                const wordData = availableWords[Math.floor(Math.random() * availableWords.length)];
+                this.usedWords.add(wordData.word);
                 
-                const x = Math.random() * (this.canvas.width - 300) + 150;
-                const speed = 1 + this.level * 0.2;
+                const x = Math.random() * (this.canvas.width - 400) + 200;
+                const baseSpeed = this.gameMode === 'knowledge' ? 1 : 1.8;
+                const speed = baseSpeed + this.level * 0.4;
                 
-                this.words.push(new SnowflakeWord(wordData, x, -50, speed, this.ctx));
+                const newWord = new SnowflakeWord(wordData, x, -80, speed, this.ctx);
+                this.words.push(newWord);
+                
+                // Автоматически выбираем первое слово в режиме проверки
+                if (!this.needClickSelection && !this.selectedWord) {
+                    this.selectWord(newWord);
+                }
             }
 
             levelUp() {
@@ -678,26 +959,29 @@
                 this.wordsCompleted = 0;
                 this.words = [];
                 this.stoppedWords = [];
-                this.spawnTimer = 180;
+                this.spawnTimer = 60;
+                this.maxWordsOnScreen = Math.min(this.level + 1, 3); // Увеличиваем количество слов
                 
                 this.createFireworks();
                 
                 document.getElementById('newLevel').textContent = this.level;
                 document.getElementById('affirmation').textContent = 
                     affirmations[Math.floor(Math.random() * affirmations.length)];
-                document.getElementById('levelScore').textContent = this.score;
+                document.getElementById('levelScore').textContent = this.totalWordsCompleted;
+                document.getElementById('nextLevelInfo').textContent = 
+                    `Слов одновременно: ${this.maxWordsOnScreen}, Скорость: +${this.level * 40}%`;
                 
                 this.showScreen('levelUpScreen');
                 this.gameState = 'levelUp';
             }
 
             createFireworks() {
-                for (let i = 0; i < 50; i++) {
+                for (let i = 0; i < 30; i++) {
                     setTimeout(() => {
                         const x = Math.random() * this.canvas.width;
                         const y = Math.random() * this.canvas.height;
-                        this.createSnowExplosion(x, y, 10);
-                    }, i * 50);
+                        this.createSnowExplosion(x, y, 8);
+                    }, i * 40);
                 }
             }
 
@@ -723,16 +1007,6 @@
             }
 
             showPauseScreen() {
-                const revisionList = document.getElementById('revisionWords');
-                revisionList.innerHTML = '';
-                
-                this.wordsForRevision.forEach(wordData => {
-                    const div = document.createElement('div');
-                    div.className = 'word-item revision-word';
-                    div.innerHTML = this.highlightWord(wordData);
-                    revisionList.appendChild(div);
-                });
-                
                 this.showScreen('pauseScreen');
             }
 
@@ -749,59 +1023,39 @@
                         result += wordData.masked[i];
                     }
                 }
-                return result;
+                return wordData.word + ' → ' + result;
             }
 
             showScreen(screenId) {
-                document.querySelectorAll('#pauseScreen, #gameOverScreen, #levelUpScreen')
+                document.querySelectorAll('#pauseScreen, #gameOverScreen, #levelUpScreen, #dictionaryScreen')
                     .forEach(screen => screen.classList.add('hidden'));
                 document.getElementById(screenId).classList.remove('hidden');
             }
 
             hideAllScreens() {
-                document.querySelectorAll('#pauseScreen, #gameOverScreen, #levelUpScreen')
+                document.querySelectorAll('#pauseScreen, #gameOverScreen, #levelUpScreen, #dictionaryScreen')
                     .forEach(screen => screen.classList.add('hidden'));
                 this.hideZoomedWord();
             }
 
             restart() {
-                this.words = [];
-                this.stoppedWords = [];
-                this.score = 0;
-                this.lives = 3;
-                this.level = 1;
-                this.wordsCompleted = 0;
-                this.wordsForRevision = [];
-                this.gameState = 'playing';
-                this.spawnTimer = 180;
-                this.selectedWord = null;
-                this.hideZoomedWord();
-                this.updateUI();
-                this.hideAllScreens();
+                this.startGame(this.gameMode);
             }
 
             update() {
                 if (this.gameState !== 'playing') return;
 
+                // Обновляем слова
                 this.words.forEach(word => {
                     if (word.update()) {
-                        if (word.y >= this.canvas.height - 50 && !word.completed) {
-                            this.stoppedWords.push(word);
-                            this.words = this.words.filter(w => w !== word);
-                            this.lives--;
-                            this.updateUI();
-                            
-                            if (this.isMobile && this.selectedWord === word) {
-                                this.hideZoomedWord();
-                            }
-                            
-                            if (this.lives <= 0) {
-                                this.gameOver();
-                            }
+                        // Проверка падения слова
+                        if (word.y >= this.canvas.height - 60 && !word.completed && !word.disappearing) {
+                            this.handleFallenWord(word);
                         }
                     }
                 });
                 
+                // Обновляем декоративные снежинки
                 this.snowflakes.forEach(flake => {
                     flake.y += flake.speed;
                     if (flake.y > this.canvas.height) {
@@ -810,44 +1064,84 @@
                     }
                 });
                 
+                // Спавн новых слов
                 this.spawnTimer--;
-                if (this.spawnTimer <= 0 && this.words.length === 0) {
+                if (this.spawnTimer <= 0) {
                     this.spawnWord();
-                    this.spawnTimer = Math.random() * 120 + 180;
+                    this.spawnTimer = this.gameMode === 'knowledge' ? 180 : 100 - (this.level * 8);
                 }
                 
+                // Обновляем частицы
                 this.particles = this.particles.filter(particle => particle.update());
+                
+                // Проверка проигрыша в режиме скорости
+                if (this.gameMode === 'speed' && this.stoppedWords.length >= 10) {
+                    this.gameOver(false);
+                }
             }
 
-            gameOver() {
-                document.getElementById('finalScore').textContent = this.score;
+            handleFallenWord(word) {
+                // В режиме скорости снежинки падают вниз и остаются там
+                if (this.gameMode === 'speed') {
+                    word.y = this.canvas.height - 60 - (this.stoppedWords.length * 70);
+                    word.speed = 0;
+                    this.stoppedWords.push(word);
+                    this.words = this.words.filter(w => w !== word);
+                } else {
+                    // В режиме проверки просто убираем слово
+                    this.stoppedWords.push(word);
+                    this.words = this.words.filter(w => w !== word);
+                    this.lives--;
+                    if (this.lives <= 0) {
+                        this.gameOver(false);
+                    }
+                }
+                
+                if (this.selectedWord === word) {
+                    this.selectedWord = this.words.find(w => !w.completed) || null;
+                    if (this.isMobile && this.selectedWord && this.needClickSelection) {
+                        this.showZoomedWord(this.selectedWord);
+                    }
+                }
+                
+                this.updateUI();
+            }
+
+            gameOver(isVictory) {
+                document.getElementById('finalSnowflakes').textContent = this.totalWordsCompleted;
                 document.getElementById('finalLevel').textContent = this.level;
-                document.getElementById('totalWords').textContent = this.wordsCompleted;
+                document.getElementById('totalWordsCompleted').textContent = this.totalWordsCompleted;
+                
+                if (isVictory) {
+                    document.querySelector('#gameOverScreen h1').textContent = '🎉 ПОБЕДА!';
+                }
+                
                 this.showScreen('gameOverScreen');
                 this.gameState = 'gameOver';
                 this.hideZoomedWord();
             }
 
             updateUI() {
-                document.getElementById('score').textContent = this.score;
+                document.getElementById('snowflakeCount').textContent = this.totalWordsCompleted;
                 document.getElementById('lives').textContent = this.lives;
                 document.getElementById('level').textContent = this.level;
                 document.getElementById('wordsCompleted').textContent = this.wordsCompleted;
                 document.getElementById('revisionCount').textContent = this.wordsForRevision.length;
-                document.getElementById('snowflakeCount').textContent = this.stoppedWords.length;
                 
-                const progress = (this.wordsCompleted / 8) * 100;
+                const progress = this.gameMode === 'knowledge' ? 
+                    (this.wordsCompleted / vocabulary.length) * 100 : 
+                    (this.wordsCompleted / 8) * 100;
                 document.getElementById('levelProgress').style.width = progress + '%';
             }
 
             createBackgroundSnowflakes() {
-                for (let i = 0; i < 30; i++) {
+                for (let i = 0; i < 25; i++) {
                     this.snowflakes.push({
                         x: Math.random() * this.canvas.width,
                         y: Math.random() * this.canvas.height,
                         size: Math.random() * 2 + 1,
-                        speed: Math.random() * 0.5 + 0.2,
-                        opacity: Math.random() * 0.3 + 0.1
+                        speed: Math.random() * 0.3 + 0.1,
+                        opacity: Math.random() * 0.2 + 0.1
                     });
                 }
             }
@@ -858,10 +1152,16 @@
                 
                 this.drawBackgroundSnowflakes();
                 
+                // Рисуем остановившиеся слова (сугроб в режиме скорости)
                 this.stoppedWords.forEach(word => word.drawStopped());
                 
-                this.words.forEach(word => word.draw());
+                // Рисуем активные слова
+                this.words.forEach(word => {
+                    word.isSelected = (word === this.selectedWord);
+                    word.draw();
+                });
                 
+                // Рисуем частицы
                 this.particles.forEach(particle => particle.draw());
             }
 
@@ -900,27 +1200,29 @@
                 this.error = null;
                 this.errorTimer = 0;
                 this.completed = false;
+                this.disappearing = false;
+                this.disappearProgress = 0;
                 this.rotation = Math.random() * Math.PI * 2;
                 this.rotationSpeed = (Math.random() - 0.5) * 0.02;
+                this.isSelected = false;
+                this.hoverAlpha = 0.3;
+                this.gapBlinkTimer = 0;
                 
                 this.gapPositions = this.findGapPositions();
             }
 
             findGapPositions() {
                 const positions = [];
-                let i = 0;
-                
-                while (i < this.masked.length) {
+                for (let i = 0; i < this.masked.length; i++) {
                     if (this.masked[i] === '_') {
                         positions.push(i);
                     }
-                    i++;
                 }
                 return positions;
             }
 
             processInput(letter) {
-                if (this.completed || this.error) return false;
+                if (this.completed || this.error || this.disappearing) return false;
 
                 if (this.currentGap < this.missingLetters.length) {
                     const correctLetter = this.missingLetters[this.currentGap];
@@ -942,8 +1244,21 @@
                 return false;
             }
 
+            startDisappearAnimation() {
+                this.disappearing = true;
+                this.disappearProgress = 0;
+            }
+
             update() {
-                if (!this.completed) {
+                if (this.disappearing) {
+                    this.disappearProgress += 0.02;
+                    if (this.disappearProgress >= 1) {
+                        return false;
+                    }
+                    return true;
+                }
+
+                if (!this.completed && this.speed > 0) {
                     this.y += this.speed;
                     this.rotation += this.rotationSpeed;
                 }
@@ -955,16 +1270,40 @@
                     }
                 }
 
+                // Анимация ховера (только в режиме скорости)
+                if (this.isSelected) {
+                    this.hoverAlpha = Math.min(this.hoverAlpha + 0.05, 1);
+                } else {
+                    this.hoverAlpha = Math.max(this.hoverAlpha - 0.05, 0.3);
+                }
+
+                // Мигание текущего пропуска
+                this.gapBlinkTimer += 0.05;
+
                 return true;
             }
 
             draw() {
                 this.ctx.save();
                 this.ctx.translate(this.x, this.y);
-                this.ctx.rotate(this.rotation);
                 
-                this.drawSnowflakeShape();
-                this.drawWordText();
+                if (this.disappearing) {
+                    // Анимация исчезновения
+                    const scale = 1 + this.disappearProgress * 0.5;
+                    const rotation = this.rotation + this.disappearProgress * Math.PI * 2;
+                    const alpha = 1 - this.disappearProgress;
+                    
+                    this.ctx.rotate(rotation);
+                    this.ctx.scale(scale, scale);
+                    this.ctx.globalAlpha = alpha;
+                    
+                    this.drawSnowflakeShape();
+                    this.drawWordText();
+                } else {
+                    this.ctx.rotate(this.rotation);
+                    this.drawSnowflakeShape();
+                    this.drawWordText();
+                }
                 
                 this.ctx.restore();
             }
@@ -972,31 +1311,30 @@
             drawStopped() {
                 this.ctx.save();
                 this.ctx.translate(this.x, this.y);
-                
                 this.drawSnowflakeShape();
                 this.drawWordText();
-                
                 this.ctx.restore();
             }
 
             drawSnowflakeShape() {
-                this.ctx.strokeStyle = '#87CEEB';
-                this.ctx.lineWidth = 2;
-                this.ctx.globalAlpha = 0.8;
+                const alpha = this.isSelected ? 1 : 0.6;
                 
-                // Увеличенная снежинка
+                this.ctx.strokeStyle = `rgba(135, 206, 235, ${alpha})`;
+                this.ctx.lineWidth = this.isSelected ? 3 : 2;
+                this.ctx.globalAlpha = alpha;
+                
                 for (let i = 0; i < 6; i++) {
                     this.ctx.rotate(Math.PI / 3);
                     this.ctx.beginPath();
                     this.ctx.moveTo(0, 0);
-                    this.ctx.lineTo(0, 45); // Увеличили с 30 до 45
+                    this.ctx.lineTo(0, 50);
                     this.ctx.stroke();
                     
                     this.ctx.beginPath();
                     this.ctx.moveTo(0, 15);
-                    this.ctx.lineTo(-12, 22);
+                    this.ctx.lineTo(-12, 25);
                     this.ctx.moveTo(0, 15);
-                    this.ctx.lineTo(12, 22);
+                    this.ctx.lineTo(12, 25);
                     this.ctx.stroke();
                 }
                 
@@ -1005,17 +1343,18 @@
 
             drawWordText() {
                 const displayText = this.getDisplayText();
-                const fontSize = 18; // Увеличили с 14 до 18
+                const fontSize = 20;
+                const alpha = this.isSelected ? 1 : 0.7;
                 
-                this.ctx.font = `bold ${fontSize}px Arial`;
+                this.ctx.font = `600 ${fontSize}px 'Montserrat', sans-serif`;
                 this.ctx.textAlign = 'center';
                 this.ctx.textBaseline = 'middle';
                 
-                this.ctx.strokeStyle = '#000';
+                this.ctx.strokeStyle = `rgba(0, 0, 0, ${alpha})`;
                 this.ctx.lineWidth = 4;
                 this.ctx.strokeText(displayText, 0, 0);
                 
-                this.ctx.fillStyle = '#FFFFFF';
+                this.ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
                 this.ctx.fillText(displayText, 0, 0);
             }
 
@@ -1026,13 +1365,14 @@
                 
                 let result = '';
                 let gapIndex = 0;
+                const shouldBlink = Math.sin(this.gapBlinkTimer) > 0;
                 
                 for (let i = 0; i < this.masked.length; i++) {
                     if (this.masked[i] === '_') {
                         if (gapIndex < this.currentGap) {
                             result += this.correctlyFilled[gapIndex];
-                        } else if (gapIndex === this.currentGap) {
-                            result += "_";
+                        } else if (gapIndex === this.currentGap && shouldBlink) {
+                            result += `<span class="current-gap">_</span>`;
                         } else {
                             result += '_';
                         }
@@ -1076,9 +1416,9 @@
             constructor(x, y, ctx) {
                 this.x = x;
                 this.y = y;
-                this.size = Math.random() * 4 + 2;
-                this.speedX = Math.random() * 6 - 3;
-                this.speedY = Math.random() * 6 - 3;
+                this.size = Math.random() * 5 + 2;
+                this.speedX = Math.random() * 8 - 4;
+                this.speedY = Math.random() * 8 - 4;
                 this.life = 1.0;
                 this.ctx = ctx;
                 this.rotation = Math.random() * Math.PI * 2;
@@ -1101,7 +1441,7 @@
                 this.ctx.globalAlpha = this.life;
                 
                 this.ctx.strokeStyle = '#87CEEB';
-                this.ctx.lineWidth = 1;
+                this.ctx.lineWidth = 2;
                 
                 for (let i = 0; i < 6; i++) {
                     this.ctx.rotate(Math.PI / 3);
