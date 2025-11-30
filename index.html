@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Словарные слова на Д - Игра</title>
+    <title>Снежинки-слова - Игра</title>
     <style>
         * {
             margin: 0;
@@ -42,10 +42,11 @@
         .panel {
             background: rgba(30, 40, 50, 0.9);
             padding: 15px 25px;
-            border-radius: 10px;
-            border: 2px solid #ffd700;
+            border-radius: 15px;
+            border: 2px solid #87CEEB;
             margin: 20px;
             pointer-events: auto;
+            backdrop-filter: blur(10px);
         }
 
         #scorePanel {
@@ -81,13 +82,13 @@
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #2ecc71, #27ae60);
+            background: linear-gradient(90deg, #87CEEB, #4682B4);
             border-radius: 4px;
             transition: width 0.3s ease;
         }
 
         .btn {
-            background: linear-gradient(45deg, #3498db, #2980b9);
+            background: linear-gradient(45deg, #87CEEB, #4682B4);
             color: white;
             border: none;
             padding: 12px 24px;
@@ -101,11 +102,7 @@
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
-        }
-
-        .btn-danger {
-            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            box-shadow: 0 5px 15px rgba(135, 206, 235, 0.4);
         }
 
         .btn-success {
@@ -137,7 +134,7 @@
             background: rgba(30, 40, 50, 0.95);
             padding: 40px;
             border-radius: 20px;
-            border: 3px solid #ffd700;
+            border: 3px solid #87CEEB;
             text-align: center;
             max-width: 600px;
             max-height: 80vh;
@@ -145,14 +142,14 @@
         }
 
         h1 {
-            color: #ffd700;
+            color: #87CEEB;
             font-size: 2.5em;
             margin-bottom: 20px;
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+            text-shadow: 0 0 10px rgba(135, 206, 235, 0.3);
         }
 
         h2 {
-            color: #3498db;
+            color: #87CEEB;
             margin-bottom: 15px;
         }
 
@@ -168,7 +165,7 @@
             padding: 8px 12px;
             background: rgba(52, 73, 94, 0.6);
             border-radius: 5px;
-            border-left: 3px solid #2ecc71;
+            border-left: 3px solid #87CEEB;
         }
 
         .revision-word {
@@ -188,11 +185,11 @@
 
         .affirmation {
             font-size: 1.3em;
-            color: #2ecc71;
+            color: #87CEEB;
             font-style: italic;
             margin: 20px 0;
             padding: 15px;
-            background: rgba(46, 204, 113, 0.1);
+            background: rgba(135, 206, 235, 0.1);
             border-radius: 10px;
         }
 
@@ -200,32 +197,23 @@
             display: none !important;
         }
 
-        #stars {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: -1;
-        }
-
-        .star {
+        .snowflake {
             position: absolute;
-            background: white;
-            border-radius: 50%;
-            animation: twinkle 3s infinite;
-        }
-
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 1; }
-        }
-
-        .particle {
-            position: absolute;
+            color: #87CEEB;
+            font-size: 20px;
             pointer-events: none;
-            border-radius: 50%;
+            user-select: none;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+            }
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
         }
     </style>
 </head>
@@ -235,19 +223,20 @@
         
         <div id="uiOverlay">
             <div id="scorePanel" class="panel">
-                <div>Счет: <span id="score">0</span></div>
-                <div>Жизни: <span id="lives">3</span></div>
+                <div>❄️ Снежинок: <span id="snowflakeCount">0</span></div>
+                <div>❤️ Жизни: <span id="lives">3</span></div>
+                <div>⭐ Счет: <span id="score">0</span></div>
             </div>
             
             <div id="levelPanel" class="panel">
-                <div>Уровень: <span id="level">1</span></div>
-                <div>Слов: <span id="wordsCompleted">0</span>/10</div>
+                <div>🎯 Уровень: <span id="level">1</span></div>
+                <div>📝 Слов: <span id="wordsCompleted">0</span>/8</div>
             </div>
             
             <button id="pauseBtn" class="btn">⏸️ Пауза</button>
             
             <div id="progressPanel" class="panel">
-                <div>Слова для повторения: <span id="revisionCount">0</span></div>
+                <div>🔄 Для повторения: <span id="revisionCount">0</span></div>
                 <div class="progress-bar">
                     <div id="levelProgress" class="progress-fill" style="width: 0%"></div>
                 </div>
@@ -258,9 +247,10 @@
         <div id="pauseScreen" class="hidden">
             <div class="screen-content">
                 <h1>⏸️ ПАУЗА</h1>
+                <h3>❄️ Слова-снежинки для повторения:</h3>
                 <div id="revisionWords" class="word-list"></div>
-                <button id="resumeBtn" class="btn btn-success">Продолжить игру</button>
-                <button id="restartBtn" class="btn">Начать заново</button>
+                <button id="resumeBtn" class="btn btn-success">▶️ Продолжить</button>
+                <button id="restartBtn" class="btn">🔄 Начать заново</button>
             </div>
         </div>
 
@@ -270,10 +260,10 @@
                 <h1>🎉 УРОВЕНЬ <span id="newLevel">2</span>!</h1>
                 <div id="affirmation" class="affirmation"></div>
                 <div class="stats">
-                    <div>Набрано очков: <span id="levelScore">0</span></div>
-                    <div>Точность: <span id="accuracy">100%</span></div>
+                    <div>❄️ Снежинок собрано: <span id="levelScore">0</span></div>
+                    <div>🎯 Точность: <span id="accuracy">100%</span></div>
                 </div>
-                <button id="nextLevelBtn" class="btn btn-success">Следующий уровень</button>
+                <button id="nextLevelBtn" class="btn btn-success">❄️ Следующий уровень</button>
             </div>
         </div>
 
@@ -282,16 +272,14 @@
             <div class="screen-content">
                 <h1>💀 ИГРА ОКОНЧЕНА</h1>
                 <div class="stats">
-                    <div>Финальный счет: <span id="finalScore">0</span></div>
-                    <div>Достигнутый уровень: <span id="finalLevel">1</span></div>
-                    <div>Слов отгадано: <span id="totalWords">0</span></div>
+                    <div>⭐ Финальный счет: <span id="finalScore">0</span></div>
+                    <div>🎯 Уровень: <span id="finalLevel">1</span></div>
+                    <div>❄️ Снежинок собрано: <span id="totalWords">0</span></div>
                 </div>
-                <button id="playAgainBtn" class="btn btn-success">Играть снова</button>
+                <button id="playAgainBtn" class="btn btn-success">🔄 Играть снова</button>
             </div>
         </div>
     </div>
-
-    <div id="stars"></div>
 
     <script>
         // Словарь слов
@@ -326,13 +314,11 @@
 
         // Аффирмации для перехода уровней
         const affirmations = [
-            "Твой мозг становится сильнее с каждым словом! 💪",
-            "Грамотность - твой суперсила! 🦸‍♂️",
-            "Каждая ошибка делает тебя умнее! 🧠",
-            "Ты создаешь свое успешное будущее! 🌟",
-            "Знания - твоя самая крутая инвестиция! 💰",
-            "Ты становишься мастером слова! 📚",
-            "Образование - ключ к твоим мечтам! 🔑"
+            "Ты собрал снегопад знаний! ❄️",
+            "С каждым уровнем твоя грамотность растет! 📚",
+            "Ты - настоящий мастер слов-снежинок! 🌟",
+            "Зимняя буря грамотности под твоей властью! ⛄",
+            "Твои знания сверкают как снег на солнце! ☀️"
         ];
 
         class Game {
@@ -342,37 +328,25 @@
                 this.resizeCanvas();
                 
                 this.words = [];
+                this.stoppedWords = [];
                 this.score = 0;
                 this.lives = 3;
                 this.level = 1;
                 this.wordsCompleted = 0;
                 this.wordsForRevision = [];
                 this.gameState = 'playing';
-                this.spawnTimer = 0;
+                this.spawnTimer = 180; // 3 секунды до первого слова
                 this.particles = [];
+                this.snowflakes = [];
                 
-                this.stars = this.createStars();
                 this.setupEventListeners();
+                this.createBackgroundSnowflakes();
                 this.gameLoop();
             }
 
             resizeCanvas() {
                 this.canvas.width = window.innerWidth;
                 this.canvas.height = window.innerHeight;
-            }
-
-            createStars() {
-                const stars = [];
-                for (let i = 0; i < 100; i++) {
-                    stars.push({
-                        x: Math.random() * this.canvas.width,
-                        y: Math.random() * this.canvas.height,
-                        size: Math.random() * 2 + 0.5,
-                        brightness: Math.random() * 0.7 + 0.3,
-                        speed: Math.random() * 0.2 + 0.1
-                    });
-                }
-                return stars;
             }
 
             setupEventListeners() {
@@ -386,6 +360,19 @@
                 document.getElementById('playAgainBtn').addEventListener('click', () => this.restart());
             }
 
+            createBackgroundSnowflakes() {
+                // Создаем декоративные снежинки на заднем плане
+                for (let i = 0; i < 30; i++) {
+                    this.snowflakes.push({
+                        x: Math.random() * this.canvas.width,
+                        y: Math.random() * this.canvas.height,
+                        size: Math.random() * 2 + 1,
+                        speed: Math.random() * 0.5 + 0.2,
+                        opacity: Math.random() * 0.3 + 0.1
+                    });
+                }
+            }
+
             handleKeyPress(e) {
                 if (this.gameState !== 'playing') return;
                 
@@ -395,23 +382,28 @@
             }
 
             processInput(letter) {
-                for (let word of this.words) {
-                    if (!word.completed && !word.error) {
-                        if (word.processInput(letter)) {
-                            if (word.completed) {
-                                this.wordsCompleted++;
-                                this.score += 100 * this.level;
-                                this.updateUI();
-                                
-                                if (this.wordsCompleted >= 10) {
-                                    this.levelUp();
-                                }
+                // Ищем активное падающее слово (первое не завершенное)
+                const activeWord = this.words.find(word => !word.completed && !word.error);
+                
+                if (activeWord) {
+                    if (activeWord.processInput(letter)) {
+                        if (activeWord.completed) {
+                            this.wordsCompleted++;
+                            this.score += 100 * this.level;
+                            this.createSnowExplosion(activeWord.x, activeWord.y, 15);
+                            
+                            // Удаляем завершенное слово
+                            this.words = this.words.filter(w => w !== activeWord);
+                            
+                            if (this.wordsCompleted >= 8) {
+                                this.levelUp();
                             }
-                            return true;
-                        } else if (word.error) {
-                            this.addToRevision(word.originalData);
-                            return false;
                         }
+                        return true;
+                    } else {
+                        // Ошибка - слово попадает в повторение
+                        this.addToRevision(activeWord.originalData);
+                        return false;
                     }
                 }
                 return false;
@@ -425,6 +417,8 @@
             }
 
             spawnWord() {
+                if (this.words.length > 0) return; // Только одно слово одновременно
+                
                 const availableWords = vocabulary.filter(word => 
                     !this.wordsForRevision.find(rev => rev.word === word.word)
                 );
@@ -433,17 +427,21 @@
                     availableWords[Math.floor(Math.random() * availableWords.length)] : 
                     vocabulary[Math.floor(Math.random() * vocabulary.length)];
                 
-                const x = Math.random() * (this.canvas.width - 400) + 200;
-                const speed = Math.random() * 1 + 1 + this.level * 0.2;
+                const x = Math.random() * (this.canvas.width - 300) + 150;
+                const speed = 1 + this.level * 0.2;
                 
-                this.words.push(new FallingWord(wordData, x, -50, speed, this.ctx));
+                this.words.push(new SnowflakeWord(wordData, x, -50, speed, this.ctx));
             }
 
             levelUp() {
                 this.level++;
                 this.wordsCompleted = 0;
                 this.words = [];
-                this.spawnTimer = 0;
+                this.stoppedWords = [];
+                this.spawnTimer = 180;
+                
+                // Создаем фейерверк из снежинок
+                this.createFireworks();
                 
                 document.getElementById('newLevel').textContent = this.level;
                 document.getElementById('affirmation').textContent = 
@@ -452,6 +450,22 @@
                 
                 this.showScreen('levelUpScreen');
                 this.gameState = 'levelUp';
+            }
+
+            createFireworks() {
+                for (let i = 0; i < 50; i++) {
+                    setTimeout(() => {
+                        const x = Math.random() * this.canvas.width;
+                        const y = Math.random() * this.canvas.height;
+                        this.createSnowExplosion(x, y, 10);
+                    }, i * 50);
+                }
+            }
+
+            createSnowExplosion(x, y, count) {
+                for (let i = 0; i < count; i++) {
+                    this.particles.push(new SnowParticle(x, y, this.ctx));
+                }
             }
 
             nextLevel() {
@@ -493,7 +507,6 @@
                         result += `<span class="correct-letter">${correctLetter}</span>`;
                         gapIndex++;
                         
-                        // Пропускаем остальные точки в этом пропуске
                         while (i < wordData.masked.length - 1 && 
                               (wordData.masked[i + 1] === '.' || wordData.masked[i + 1] === '…')) {
                             i++;
@@ -518,13 +531,14 @@
 
             restart() {
                 this.words = [];
+                this.stoppedWords = [];
                 this.score = 0;
                 this.lives = 3;
                 this.level = 1;
                 this.wordsCompleted = 0;
                 this.wordsForRevision = [];
                 this.gameState = 'playing';
-                this.spawnTimer = 0;
+                this.spawnTimer = 180;
                 this.updateUI();
                 this.hideAllScreens();
             }
@@ -532,36 +546,37 @@
             update() {
                 if (this.gameState !== 'playing') return;
 
-                // Обновляем слова
-                this.words = this.words.filter(word => word.update());
+                // Обновляем падающие слова
+                this.words.forEach(word => {
+                    if (word.update()) {
+                        // Если слово достигло низа
+                        if (word.y >= this.canvas.height - 50 && !word.completed) {
+                            this.stoppedWords.push(word);
+                            this.words = this.words.filter(w => w !== word);
+                            this.lives--;
+                            this.updateUI();
+                            
+                            if (this.lives <= 0) {
+                                this.gameOver();
+                            }
+                        }
+                    }
+                });
+                
+                // Обновляем декоративные снежинки
+                this.snowflakes.forEach(flake => {
+                    flake.y += flake.speed;
+                    if (flake.y > this.canvas.height) {
+                        flake.y = 0;
+                        flake.x = Math.random() * this.canvas.width;
+                    }
+                });
                 
                 // Спавн новых слов
                 this.spawnTimer--;
-                if (this.spawnTimer <= 0) {
+                if (this.spawnTimer <= 0 && this.words.length === 0) {
                     this.spawnWord();
-                    this.spawnTimer = Math.random() * 60 + 60; // 1-2 секунды
-                }
-                
-                // Проверка проигрыша
-                const bottomWords = this.words.filter(word => 
-                    word.y > this.canvas.height - 100 && !word.completed
-                );
-                
-                if (bottomWords.length > 5) {
-                    this.lives--;
-                    this.updateUI();
-                    
-                    // Удаляем несколько слов снизу
-                    bottomWords.slice(0, 2).forEach(word => {
-                        const index = this.words.indexOf(word);
-                        if (index > -1) {
-                            this.words.splice(index, 1);
-                        }
-                    });
-                    
-                    if (this.lives <= 0) {
-                        this.gameOver();
-                    }
+                    this.spawnTimer = Math.random() * 120 + 180; // 3-5 секунд
                 }
                 
                 // Обновляем частицы
@@ -582,15 +597,10 @@
                 document.getElementById('level').textContent = this.level;
                 document.getElementById('wordsCompleted').textContent = this.wordsCompleted;
                 document.getElementById('revisionCount').textContent = this.wordsForRevision.length;
+                document.getElementById('snowflakeCount').textContent = this.stoppedWords.length;
                 
-                const progress = (this.wordsCompleted / 10) * 100;
+                const progress = (this.wordsCompleted / 8) * 100;
                 document.getElementById('levelProgress').style.width = progress + '%';
-            }
-
-            createParticles(x, y, color, count) {
-                for (let i = 0; i < count; i++) {
-                    this.particles.push(new Particle(x, y, color, this.ctx));
-                }
             }
 
             draw() {
@@ -598,29 +608,28 @@
                 this.ctx.fillStyle = '#0a141e';
                 this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
                 
-                // Рисуем звезды
-                this.drawStars();
+                // Рисуем декоративные снежинки
+                this.drawBackgroundSnowflakes();
                 
-                // Рисуем слова
+                // Рисуем остановившиеся слова-снежинки
+                this.stoppedWords.forEach(word => word.drawStopped());
+                
+                // Рисуем падающие слова
                 this.words.forEach(word => word.draw());
                 
                 // Рисуем частицы
                 this.particles.forEach(particle => particle.draw());
             }
 
-            drawStars() {
-                this.stars.forEach(star => {
-                    this.ctx.fillStyle = `rgba(255, 255, 255, ${star.brightness})`;
+            drawBackgroundSnowflakes() {
+                this.snowflakes.forEach(flake => {
+                    this.ctx.save();
+                    this.ctx.globalAlpha = flake.opacity;
+                    this.ctx.fillStyle = '#87CEEB';
                     this.ctx.beginPath();
-                    this.ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                    this.ctx.arc(flake.x, flake.y, flake.size, 0, Math.PI * 2);
                     this.ctx.fill();
-                    
-                    // Анимация звезд
-                    star.y += star.speed;
-                    if (star.y > this.canvas.height) {
-                        star.y = 0;
-                        star.x = Math.random() * this.canvas.width;
-                    }
+                    this.ctx.restore();
                 });
             }
 
@@ -632,7 +641,7 @@
             }
         }
 
-        class FallingWord {
+        class SnowflakeWord {
             constructor(wordData, x, y, speed, ctx) {
                 this.originalData = wordData;
                 this.word = wordData.word;
@@ -647,13 +656,14 @@
                 this.error = null;
                 this.errorTimer = 0;
                 this.completed = false;
-                this.completionTimer = 1.0;
-                this.particles = [];
+                this.rotation = Math.random() * Math.PI * 2;
+                this.rotationSpeed = (Math.random() - 0.5) * 0.02;
             }
 
             update() {
                 if (!this.completed) {
                     this.y += this.speed;
+                    this.rotation += this.rotationSpeed;
                 }
 
                 if (this.error) {
@@ -663,13 +673,7 @@
                     }
                 }
 
-                if (this.completed) {
-                    this.completionTimer -= 0.03;
-                    this.particles = this.particles.filter(p => p.update());
-                    return this.completionTimer > 0;
-                }
-
-                return this.y < this.ctx.canvas.height + 100;
+                return true;
             }
 
             processInput(letter) {
@@ -678,55 +682,89 @@
                 const correctLetter = this.missingLetters[this.currentGap];
                 
                 if (letter === correctLetter) {
+                    // Правильная буква
                     this.correctlyFilled.push(letter);
                     this.currentGap++;
                     
                     if (this.currentGap >= this.missingLetters.length) {
                         this.completed = true;
-                        // Создаем частицы для анимации завершения
-                        for (let i = 0; i < 20; i++) {
-                            this.particles.push(new Particle(
-                                this.x, this.y, '#2ecc71', this.ctx
-                            ));
-                        }
                     }
                     return true;
                 } else {
+                    // Неправильная буква
                     this.error = letter;
-                    this.errorTimer = 1.0;
+                    this.errorTimer = 1.5; // 1.5 секунды мигания
                     return false;
                 }
             }
 
             draw() {
-                if (this.completed) {
-                    this.drawCompleted();
-                } else {
-                    this.drawWord();
-                }
-                this.particles.forEach(particle => particle.draw());
-            }
-
-            drawWord() {
-                const displayText = this.getDisplayText();
-                const color = this.error ? '#e74c3c' : '#ecf0f1';
-                
-                this.ctx.font = '28px Arial';
-                this.ctx.fillStyle = color;
-                this.ctx.textAlign = 'center';
-                this.ctx.fillText(displayText, this.x, this.y);
-            }
-
-            drawCompleted() {
-                const scale = 1.0 + (1.0 - this.completionTimer) * 0.5;
-                const alpha = this.completionTimer;
-                
                 this.ctx.save();
-                this.ctx.font = `bold ${28 * scale}px Arial`;
-                this.ctx.fillStyle = `rgba(46, 204, 113, ${alpha})`;
-                this.ctx.textAlign = 'center';
-                this.ctx.fillText(this.word, this.x, this.y);
+                this.ctx.translate(this.x, this.y);
+                this.ctx.rotate(this.rotation);
+                
+                // Рисуем снежинку
+                this.drawSnowflakeShape();
+                
+                // Рисуем текст
+                this.drawWordText();
+                
                 this.ctx.restore();
+            }
+
+            drawStopped() {
+                this.ctx.save();
+                this.ctx.translate(this.x, this.y);
+                
+                // Рисуем снежинку (без вращения для остановившихся)
+                this.drawSnowflakeShape();
+                
+                // Рисуем текст
+                this.drawWordText();
+                
+                this.ctx.restore();
+            }
+
+            drawSnowflakeShape() {
+                this.ctx.strokeStyle = '#87CEEB';
+                this.ctx.lineWidth = 2;
+                this.ctx.globalAlpha = 0.8;
+                
+                // Простая снежинка
+                for (let i = 0; i < 6; i++) {
+                    this.ctx.rotate(Math.PI / 3);
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(0, 0);
+                    this.ctx.lineTo(0, 30);
+                    this.ctx.stroke();
+                    
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(0, 10);
+                    this.ctx.lineTo(-8, 15);
+                    this.ctx.moveTo(0, 10);
+                    this.ctx.lineTo(8, 15);
+                    this.ctx.stroke();
+                }
+                
+                this.ctx.globalAlpha = 1;
+            }
+
+            drawWordText() {
+                const displayText = this.getDisplayText();
+                const fontSize = 14;
+                
+                this.ctx.font = `bold ${fontSize}px Arial`;
+                this.ctx.textAlign = 'center';
+                this.ctx.textBaseline = 'middle';
+                
+                // Черная обводка для читаемости
+                this.ctx.strokeStyle = '#000';
+                this.ctx.lineWidth = 3;
+                this.ctx.strokeText(displayText, 0, 0);
+                
+                // Основной текст
+                this.ctx.fillStyle = '#FFFFFF';
+                this.ctx.fillText(displayText, 0, 0);
             }
 
             getDisplayText() {
@@ -743,11 +781,11 @@
                         const gapLength = this.getGapLength(i);
                         
                         if (gapIndex < this.currentGap) {
-                            // Уже заполненный пропуск
-                            result += this.correctlyFilled[gapIndex];
+                            // Уже заполненная буква - зеленый
+                            result += `{${this.correctlyFilled[gapIndex]}}`;
                         } else if (gapIndex === this.currentGap) {
-                            // Активный пропуск
-                            result += '[ _ ]';
+                            // Текущий пропуск - подсвечиваем
+                            result += `_`;
                         } else {
                             // Будущий пропуск
                             result += '_'.repeat(gapLength);
@@ -774,10 +812,14 @@
                         const gapLength = this.getGapLength(i);
                         
                         if (gapIndex < this.currentGap) {
-                            result += this.correctlyFilled[gapIndex];
+                            result += `{${this.correctlyFilled[gapIndex]}}`;
                         } else if (gapIndex === this.currentGap) {
-                            // Показываем ошибку
-                            result += `[ ${this.error} ]`;
+                            // Мигающая красная ошибка
+                            if (Math.floor(this.errorTimer * 10) % 2 === 0) {
+                                result += `[${this.error}]`;
+                            } else {
+                                result += '_';
+                            }
                         } else {
                             result += '_'.repeat(gapLength);
                         }
@@ -804,16 +846,17 @@
             }
         }
 
-        class Particle {
-            constructor(x, y, color, ctx) {
+        class SnowParticle {
+            constructor(x, y, ctx) {
                 this.x = x;
                 this.y = y;
-                this.color = color;
-                this.size = Math.random() * 3 + 1;
+                this.size = Math.random() * 4 + 2;
                 this.speedX = Math.random() * 6 - 3;
                 this.speedY = Math.random() * 6 - 3;
                 this.life = 1.0;
                 this.ctx = ctx;
+                this.rotation = Math.random() * Math.PI * 2;
+                this.rotationSpeed = (Math.random() - 0.5) * 0.1;
             }
 
             update() {
@@ -821,46 +864,36 @@
                 this.y += this.speedY;
                 this.life -= 0.02;
                 this.size -= 0.05;
+                this.rotation += this.rotationSpeed;
                 return this.life > 0 && this.size > 0;
             }
 
             draw() {
                 this.ctx.save();
+                this.ctx.translate(this.x, this.y);
+                this.ctx.rotate(this.rotation);
                 this.ctx.globalAlpha = this.life;
-                this.ctx.fillStyle = this.color;
-                this.ctx.beginPath();
-                this.ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                this.ctx.fill();
+                
+                // Рисуем маленькую снежинку
+                this.ctx.strokeStyle = '#87CEEB';
+                this.ctx.lineWidth = 1;
+                
+                for (let i = 0; i < 6; i++) {
+                    this.ctx.rotate(Math.PI / 3);
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(0, 0);
+                    this.ctx.lineTo(0, this.size * 2);
+                    this.ctx.stroke();
+                }
+                
                 this.ctx.restore();
-            }
-        }
-
-        // Создаем звезды для фона
-        function createBackgroundStars() {
-            const starsContainer = document.getElementById('stars');
-            for (let i = 0; i < 50; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                star.style.cssText = `
-                    position: absolute;
-                    background: white;
-                    border-radius: 50%;
-                    width: ${Math.random() * 2 + 1}px;
-                    height: ${Math.random() * 2 + 1}px;
-                    left: ${Math.random() * 100}%;
-                    top: ${Math.random() * 100}%;
-                    animation: twinkle ${Math.random() * 3 + 2}s infinite;
-                `;
-                starsContainer.appendChild(star);
             }
         }
 
         // Запуск игры при загрузке страницы
         window.addEventListener('load', () => {
-            createBackgroundStars();
             new Game();
         });
     </script>
 </body>
 </html>
-```
