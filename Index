@@ -1,0 +1,512 @@
+import pygame
+import random
+import sys
+import math
+from pygame import mixer
+
+# Инициализация Pygame
+pygame.init()
+mixer.init()
+
+# Константы экрана
+WIDTH, HEIGHT = 1200, 800
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Падающие слова - Тренажер грамотности")
+
+# Цвета
+BACKGROUND = (10, 20, 30)
+ACCENT = (255, 215, 0)
+CORRECT = (46, 204, 113)
+ERROR = (231, 76, 60)
+ACTIVE_GAP = (241, 196, 15)
+TEXT_COLOR = (236, 240, 241)
+PANEL_BG = (30, 40, 50, 200)
+
+# Шрифты
+try:
+    title_font = pygame.font.Font("arial.ttf", 48)
+    word_font = pygame.font.Font("arial.ttf", 36)
+    score_font = pygame.font.Font("arial.ttf", 28)
+    small_font = pygame.font.Font("arial.ttf", 20)
+except:
+    # Если шрифты не найдены, используем системные
+    title_font = pygame.font.SysFont("arial", 48)
+    word_font = pygame.font.SysFont("arial", 36)
+    score_font = pygame.font.SysFont("arial", 28)
+    small_font = pygame.font.SysFont("arial", 20)
+
+# Словарь слов
+vocabulary = [
+    {"word": "дебаты", "masked": "д..баты", "missing_letters": ["е", "а"]},
+    {"word": "декларация", "masked": "д..кл..рация", "missing_letters": ["е", "а", "а"]},
+    {"word": "декорация", "masked": "д..корация", "missing_letters": ["е", "о"]},
+    {"word": "декоративный", "masked": "д..коративный", "missing_letters": ["е", "о"]},
+    {"word": "деликатес", "masked": "д..л..к..тес", "missing_letters": ["е", "и", "а", "е"]},
+    {"word": "деликатный", "masked": "д..л..катный", "missing_letters": ["е", "и", "а"]},
+    {"word": "демократ", "masked": "д..м..крат", "missing_letters": ["е", "о", "а"]},
+    {"word": "демократичный", "masked": "д..м..кратичный", "missing_letters": ["е", "о", "а"]},
+    {"word": "демонстрировать", "masked": "д..м..нстрировать", "missing_letters": ["е", "о", "и"]},
+    {"word": "демонстрация", "masked": "д..м..нстрация", "missing_letters": ["е", "о", "а"]},
+    {"word": "диалог", "masked": "д..алог", "missing_letters": ["и", "а"]},
+    {"word": "диалоговый", "masked": "д..алоговый", "missing_letters": ["и", "а"]},
+    {"word": "диалогический", "masked": "д..алогический", "missing_letters": ["и", "а"]},
+    {"word": "диапазон", "masked": "д….пазон", "missing_letters": ["и", "а", "а"]},
+    {"word": "динамика", "masked": "д.намика", "missing_letters": ["и", "а"]},
+    {"word": "динамический", "masked": "д.намический", "missing_letters": ["и", "а"]},
+    {"word": "динамичный", "masked": "д.намичный", "missing_letters": ["и", "а"]},
+    {"word": "дирижер", "masked": "д..р..жёр", "missing_letters": ["и", "и", "ё"]},
+    {"word": "дирижировать", "masked": "д..р..жировать", "missing_letters": ["и", "и", "и"]},
+    {"word": "диспетчер", "masked": "д..спетчер", "missing_letters": ["и", "е"]},
+    {"word": "диспетчерский", "masked": "д..спетчерский", "missing_letters": ["и", "е"]},
+    {"word": "дистанция", "masked": "д..станция", "missing_letters": ["и", "а"]},
+    {"word": "дистанционный", "masked": "д..станционный", "missing_letters": ["и", "а"]},
+    {"word": "дисциплина", "masked": "д..сциплина", "missing_letters": ["и", "и"]},
+    {"word": "дисциплинарный", "masked": "д..сциплинарный", "missing_letters": ["и", "и", "а"]},
+    {"word": "дисциплинировать", "masked": "д..сциплинировать", "missing_letters": ["и", "и", "и"]}
+]
+
+class Particle:
+    def __init__(self, x, y, color):
+        self.x = x
+        self.y = y
+        self.color = color
+        self.size = random.randint(2, 6)
+        self.speed_x = random.uniform(-3, 3)
+        self.speed_y = random.uniform(-5, -1)
+        self.life = 1.0
+        
+    def update(self):
+        self.x += self.speed_x
+        self.y += self.speed_y
+        self.life -= 0.03
+        self.size -= 0.1
+        return self.life > 0 and self.size > 0
+    
+    def draw(self, surface):
+        alpha = int(self.life * 255)
+        color = (*self.color[:3], alpha)
+        pygame.draw.circle(surface, color, (int(self.x), int(self.y)), int(self.size))
+
+class FallingWord:
+    def __init__(self, word_data, x, speed):
+        self.word_data = word_data.copy()
+        self.x = x
+        self.y = -50
+        self.speed = speed
+        self.current_gap = 0
+        self.correctly_filled = []
+        self.error_animation = None
+        self.error_timer = 0
+        self.completion_animation = False
+        self.completion_timer = 1.0
+        self.particles = []
+        
+    def update(self):
+        if not self.completion_animation:
+            self.y += self.speed
+            
+        if self.error_animation:
+            self.error_timer -= 0.016
+            if self.error_timer <= 0:
+                self.error_animation = None
+                
+        if self.completion_animation:
+            self.completion_timer -= 0.03
+            for _ in range(3):
+                self.particles.append(Particle(
+                    self.x + random.randint(-50, 50),
+                    self.y + random.randint(-20, 20),
+                    CORRECT
+                ))
+            
+            # Обновляем частицы
+            self.particles = [p for p in self.particles if p.update()]
+            
+            return self.completion_timer > 0
+            
+        return True
+    
+    def process_input(self, letter):
+        if self.completion_animation or self.error_animation:
+            return False
+            
+        correct_letter = self.word_data["missing_letters"][self.current_gap]
+        
+        if letter.lower() == correct_letter.lower():
+            self.correctly_filled.append(letter)
+            self.current_gap += 1
+            
+            if self.current_gap >= len(self.word_data["missing_letters"]):
+                self.completion_animation = True
+                # Создаем взрыв частиц
+                for _ in range(30):
+                    self.particles.append(Particle(
+                        self.x, self.y, CORRECT
+                    ))
+            
+            return True
+        else:
+            self.error_animation = letter
+            self.error_timer = 1.0
+            return False
+    
+    def draw(self, surface):
+        if self.completion_animation:
+            # Анимация завершения - увеличение и исчезновение
+            scale = 1.0 + (1.0 - self.completion_timer) * 0.5
+            alpha = int(self.completion_timer * 255)
+            
+            # Рисуем полное слово увеличенным
+            text_surface = word_font.render(self.word_data["word"], True, CORRECT)
+            text_rect = text_surface.get_rect(center=(self.x, self.y))
+            
+            # Масштабирование
+            new_width = int(text_rect.width * scale)
+            new_height = int(text_rect.height * scale)
+            scaled_surface = pygame.transform.scale(text_surface, (new_width, new_height))
+            scaled_rect = scaled_surface.get_rect(center=(self.x, self.y))
+            
+            # Устанавливаем прозрачность
+            scaled_surface.set_alpha(alpha)
+            surface.blit(scaled_surface, scaled_rect)
+            
+        else:
+            # Обычное отображение слова с пропусками
+            display_text = self.create_display_text()
+            color = ERROR if self.error_animation else TEXT_COLOR
+            
+            text_surface = word_font.render(display_text, True, color)
+            text_rect = text_surface.get_rect(center=(self.x, self.y))
+            surface.blit(text_surface, text_rect)
+        
+        # Рисуем частицы
+        for particle in self.particles:
+            particle.draw(surface)
+    
+    def create_display_text(self):
+        if self.error_animation:
+            # Показываем ошибку с зачеркиванием
+            return self.masked_with_error()
+        
+        text_parts = []
+        gap_index = 0
+        masked = self.word_data["masked"]
+        
+        i = 0
+        while i < len(masked):
+            if masked[i] == '.' or masked[i] == '…':
+                # Находим конец пропуска
+                j = i
+                while j < len(masked) and (masked[j] == '.' or masked[j] == '…'):
+                    j += 1
+                
+                gap_length = j - i
+                
+                if gap_index < self.current_gap:
+                    # Уже заполненный пропуск
+                    letter = self.correctly_filled[gap_index]
+                    text_parts.append(letter)
+                elif gap_index == self.current_gap:
+                    # Активный пропуск
+                    text_parts.append(f"[ _ ]")
+                else:
+                    # Будущий пропуск
+                    text_parts.append("_" * gap_length)
+                
+                gap_index += 1
+                i = j
+            else:
+                text_parts.append(masked[i])
+                i += 1
+        
+        return "".join(text_parts)
+    
+    def masked_with_error(self):
+        text_parts = []
+        gap_index = 0
+        masked = self.word_data["masked"]
+        
+        i = 0
+        while i < len(masked):
+            if masked[i] == '.' or masked[i] == '…':
+                j = i
+                while j < len(masked) and (masked[j] == '.' or masked[j] == '…'):
+                    j += 1
+                
+                gap_length = j - i
+                
+                if gap_index < self.current_gap:
+                    letter = self.correctly_filled[gap_index]
+                    text_parts.append(letter)
+                elif gap_index == self.current_gap:
+                    # Показываем ошибку с зачеркиванием
+                    text_parts.append(f"[ ̶{self.error_animation}̶ ]")
+                else:
+                    text_parts.append("_" * gap_length)
+                
+                gap_index += 1
+                i = j
+            else:
+                text_parts.append(masked[i])
+                i += 1
+        
+        return "".join(text_parts)
+
+class Game:
+    def __init__(self):
+        self.words = []
+        self.score = 0
+        self.lives = 3
+        self.level = 1
+        self.words_completed = 0
+        self.words_for_revision = []
+        self.game_state = "playing"  # playing, paused, game_over
+        self.spawn_timer = 0
+        self.background_stars = self.create_stars()
+        
+    def create_stars(self):
+        stars = []
+        for _ in range(100):
+            stars.append({
+                'x': random.randint(0, WIDTH),
+                'y': random.randint(0, HEIGHT),
+                'size': random.uniform(0.5, 2),
+                'brightness': random.uniform(0.3, 1.0)
+            })
+        return stars
+    
+    def update(self):
+        if self.game_state != "playing":
+            return
+            
+        # Обновляем падающие слова
+        self.words = [word for word in self.words if word.update()]
+        
+        # Спавн новых слов
+        self.spawn_timer -= 1
+        if self.spawn_timer <= 0:
+            self.spawn_word()
+            self.spawn_timer = random.randint(60, 120)  # 1-2 секунды
+            
+        # Проверка проигрыша (экран заполнен)
+        bottom_words = [word for word in self.words if word.y >= HEIGHT - 50 and not word.completion_animation]
+        if len(bottom_words) > 8:  # Если слишком много слов внизу
+            self.lives -= 1
+            if self.lives <= 0:
+                self.game_state = "game_over"
+            else:
+                # Удаляем несколько слов снизу
+                for word in bottom_words[:3]:
+                    if word in self.words:
+                        self.words.remove(word)
+    
+    def spawn_word(self):
+        if not vocabulary:
+            return
+            
+        word_data = random.choice(vocabulary)
+        x = random.randint(200, WIDTH - 200)
+        speed = random.uniform(1.0, 2.0) + self.level * 0.2
+        
+        new_word = FallingWord(word_data, x, speed)
+        self.words.append(new_word)
+    
+    def handle_input(self, letter):
+        if self.game_state != "playing":
+            return False
+            
+        for word in self.words:
+            if not word.completion_animation and not word.error_animation:
+                if word.process_input(letter):
+                    if word.completion_animation:
+                        self.words_completed += 1
+                        self.score += 100 * self.level
+                        # Проверка перехода на новый уровень
+                        if self.words_completed >= 10:
+                            self.level_up()
+                    return True
+                elif word.error_animation:
+                    # Добавляем слово в список для повторения, если его там еще нет
+                    if word.word_data not in self.words_for_revision:
+                        self.words_for_revision.append(word.word_data)
+                    return False
+        return False
+    
+    def level_up(self):
+        self.level += 1
+        self.words_completed = 0
+        # Очищаем экран при переходе на новый уровень
+        self.words = []
+        self.spawn_timer = 180  # Пауза 3 секунды перед началом нового уровня
+    
+    def draw(self, surface):
+        # Фон с звездами
+        surface.fill(BACKGROUND)
+        for star in self.background_stars:
+            brightness = int(star['brightness'] * 255)
+            pygame.draw.circle(surface, (brightness, brightness, brightness), 
+                             (int(star['x']), int(star['y'])), star['size'])
+        
+        # Падающие слова
+        for word in self.words:
+            word.draw(surface)
+        
+        # Панель информации
+        self.draw_info_panel(surface)
+        
+        # Экран паузы
+        if self.game_state == "paused":
+            self.draw_pause_screen(surface)
+        elif self.game_state == "game_over":
+            self.draw_game_over_screen(surface)
+        
+        # Анимация перехода уровня
+        if self.words_completed == 0 and self.level > 1 and self.spawn_timer > 60:
+            self.draw_level_transition(surface)
+    
+    def draw_info_panel(self, surface):
+        # Полупрозрачная панель
+        panel = pygame.Surface((WIDTH, 80), pygame.SRCALPHA)
+        panel.fill(PANEL_BG)
+        surface.blit(panel, (0, 0))
+        
+        # Счет
+        score_text = score_font.render(f"Счет: {self.score}", True, TEXT_COLOR)
+        surface.blit(score_text, (20, 20))
+        
+        # Уровень
+        level_text = score_font.render(f"Уровень: {self.level}", True, ACCENT)
+        surface.blit(level_text, (WIDTH//2 - level_text.get_width()//2, 20))
+        
+        # Жизни
+        lives_text = score_font.render(f"Жизни: {'♥' * self.lives}", True, ERROR)
+        surface.blit(lives_text, (WIDTH - 150, 20))
+        
+        # Прогресс уровня
+        progress = min(self.words_completed / 10, 1.0)
+        pygame.draw.rect(surface, (50, 50, 50), (WIDTH//2 - 100, 60, 200, 10))
+        pygame.draw.rect(surface, CORRECT, (WIDTH//2 - 100, 60, 200 * progress, 10))
+        
+        # Слова для повторения
+        if self.words_for_revision:
+            rev_text = small_font.render(f"Слов для повторения: {len(self.words_for_revision)}", True, ERROR)
+            surface.blit(rev_text, (WIDTH - 250, 55))
+    
+    def draw_pause_screen(self, surface):
+        overlay = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 180))
+        surface.blit(overlay, (0, 0))
+        
+        title = title_font.render("ПАУЗА", True, ACCENT)
+        surface.blit(title, (WIDTH//2 - title.get_width()//2, HEIGHT//2 - 100))
+        
+        # Список слов для повторения
+        if self.words_for_revision:
+            rev_title = score_font.render("Слова для повторения:", True, ERROR)
+            surface.blit(rev_title, (WIDTH//2 - rev_title.get_width()//2, HEIGHT//2 - 20))
+            
+            for i, word_data in enumerate(self.words_for_revision[:8]):
+                # Подсвечиваем правильные буквы зеленым
+                display_text = self.highlight_correct_letters(word_data)
+                word_surface = small_font.render(display_text, True, TEXT_COLOR)
+                surface.blit(word_surface, (WIDTH//2 - word_surface.get_width()//2, 
+                                          HEIGHT//2 + 20 + i * 30))
+        
+        hint = small_font.render("Нажмите P для продолжения", True, TEXT_COLOR)
+        surface.blit(hint, (WIDTH//2 - hint.get_width()//2, HEIGHT - 100))
+    
+    def highlight_correct_letters(self, word_data):
+        result = []
+        gap_index = 0
+        masked = word_data["masked"]
+        
+        i = 0
+        while i < len(masked):
+            if masked[i] == '.' or masked[i] == '…':
+                j = i
+                while j < len(masked) and (masked[j] == '.' or masked[j] == '…'):
+                    j += 1
+                
+                correct_letter = word_data["missing_letters"][gap_index]
+                result.append(f"[{correct_letter}]")
+                gap_index += 1
+                i = j
+            else:
+                result.append(masked[i])
+                i += 1
+        
+        return "".join(result)
+    
+    def draw_level_transition(self, surface):
+        overlay = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 150))
+        surface.blit(overlay, (0, 0))
+        
+        level_text = title_font.render(f"Уровень {self.level}", True, ACCENT)
+        surface.blit(level_text, (WIDTH//2 - level_text.get_width()//2, HEIGHT//2 - 50))
+        
+        # Случайные аффирмации для подростков
+        affirmations = [
+            "Твой мозг становится сильнее с каждым словом!",
+            "Грамотность - твой суперсила!",
+            "Каждая ошибка делает тебя умнее!",
+            "Ты создаешь свое успешное будущее!",
+            "Знания - твоя самая крутая инвестиция!",
+            "Ты становишься мастером слова!",
+            "Образование - ключ к твоим мечтам!"
+        ]
+        
+        aff_text = word_font.render(random.choice(affirmations), True, CORRECT)
+        surface.blit(aff_text, (WIDTH//2 - aff_text.get_width()//2, HEIGHT//2 + 30))
+    
+    def draw_game_over_screen(self, surface):
+        overlay = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 200))
+        surface.blit(overlay, (0, 0))
+        
+        game_over = title_font.render("ИГРА ОКОНЧЕНА", True, ERROR)
+        surface.blit(game_over, (WIDTH//2 - game_over.get_width()//2, HEIGHT//2 - 100))
+        
+        score_text = score_font.render(f"Финальный счет: {self.score}", True, ACCENT)
+        surface.blit(score_text, (WIDTH//2 - score_text.get_width()//2, HEIGHT//2 - 20))
+        
+        level_text = score_font.render(f"Достигнутый уровень: {self.level}", True, CORRECT)
+        surface.blit(level_text, (WIDTH//2 - level_text.get_width()//2, HEIGHT//2 + 20))
+        
+        restart = small_font.render("Нажмите R для перезапуска", True, TEXT_COLOR)
+        surface.blit(restart, (WIDTH//2 - restart.get_width()//2, HEIGHT - 100))
+
+def main():
+    game = Game()
+    clock = pygame.time.Clock()
+    
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    running = False
+                elif event.key == pygame.K_p:
+                    if game.game_state == "playing":
+                        game.game_state = "paused"
+                    elif game.game_state == "paused":
+                        game.game_state = "playing"
+                elif event.key == pygame.K_r and game.game_state == "game_over":
+                    game = Game()  # Перезапуск игры
+                
+                # Обработка буквенных клавиш
+                if event.unicode.isalpha() and len(event.unicode) == 1:
+                    game.handle_input(event.unicode)
+        
+        game.update()
+        game.draw(screen)
+        
+        pygame.display.flip()
+        clock.tick(60)
+
+if __name__ == "__main__":
+    main()
+    pygame.quit()
+    sys.exit()
