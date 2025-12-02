@@ -74,7 +74,6 @@
             text-align: center;
         }
 
-        /* Исправляем расположение кнопок чтобы не перекрывались */
         #pauseBtn {
             position: absolute;
             top: 20px;
@@ -141,7 +140,6 @@
             box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
         }
 
-        /* Мобильная клавиатура */
         #mobileKeyboard {
             position: fixed;
             bottom: 0;
@@ -178,7 +176,6 @@
             box-shadow: 0 1px 4px rgba(135, 206, 235, 0.3);
         }
 
-        /* Увеличенное слово для мобильных */
         #zoomedWord {
             position: fixed;
             top: 50%;
@@ -213,7 +210,6 @@
             font-weight: 400;
         }
 
-        /* Экран выбора режима */
         #modeSelection {
             position: absolute;
             top: 0;
@@ -368,7 +364,43 @@
             display: none !important;
         }
 
-        /* Мобильная адаптация */
+        .bonus-panel {
+            position: absolute;
+            top: 90px;
+            left: 20px;
+            background: rgba(30, 40, 50, 0.9);
+            padding: 15px 25px;
+            border-radius: 20px;
+            border: 2px solid #FFD700;
+            pointer-events: auto;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(255, 215, 0, 0.3);
+            font-size: 14px;
+        }
+
+        .golden-snowflake {
+            color: #FFD700;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .streak-counter {
+            color: #FF6347;
+            font-weight: bold;
+            animation: streakPulse 1s infinite;
+        }
+
+        @keyframes streakPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .comet-trail {
+            position: absolute;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 200, 0.4));
+            border-radius: 50%;
+        }
+
         @media (max-width: 768px) {
             .panel {
                 padding: 12px 18px;
@@ -425,7 +457,6 @@
                 font-size: 1.6em;
             }
             
-            /* Клавиатура для мобильных */
             #mobileKeyboard {
                 display: grid;
             }
@@ -439,6 +470,13 @@
                 font-size: 30px;
                 padding: 25px;
                 min-width: 300px;
+            }
+            
+            .bonus-panel {
+                top: 70px;
+                left: 15px;
+                padding: 10px 15px;
+                font-size: 12px;
             }
         }
 
@@ -475,7 +513,11 @@
             font-weight: bold;
         }
 
-        /* Анимация взрыва снежинки */
+        .golden-count {
+            color: #FFD700;
+            font-weight: bold;
+        }
+
         @keyframes snowflakeExplode {
             0% {
                 transform: scale(1) rotate(0deg);
@@ -494,6 +536,17 @@
         .snowflake-explode {
             animation: snowflakeExplode 0.6s ease-out forwards;
         }
+
+        @keyframes goldenGlow {
+            0%, 100% { 
+                filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.7));
+                transform: scale(1);
+            }
+            50% { 
+                filter: drop-shadow(0 0 15px rgba(255, 215, 0, 1));
+                transform: scale(1.1);
+            }
+        }
     </style>
 </head>
 <body>
@@ -505,6 +558,13 @@
                 <div>❄️ Снежинок: <span id="snowflakeCount" class="snowflake-count">0</span></div>
                 <div>❤️ Жизни: <span id="lives" class="life">3</span></div>
                 <div>⭐ Уровень: <span id="level">1</span></div>
+                <div>🔥 Серия: <span id="streakCounter" class="streak-counter">0</span></div>
+            </div>
+            
+            <div id="bonusPanel" class="bonus-panel hidden">
+                <div>💰 Бонусы: +<span id="bonusPoints">0</span></div>
+                <div>🌟 Золотых: <span id="goldenCount" class="golden-count">0</span></div>
+                <div>⚡ Быстрых ответов: <span id="quickAnswers">0</span></div>
             </div>
             
             <div id="levelPanel" class="panel">
@@ -537,8 +597,8 @@
                     </div>
                     
                     <div class="mode-card">
-                        <h2>⚡ На скорость</h2>
-                        <p>Слова падают быстрее и по несколько сразу. Уровень растет каждые 8 слов. Проиграешь, если экран заполнится!</p>
+                        <h2>⚡ На скорость + Бонусы</h2>
+                        <p>Слова падают быстрее, по несколько сразу. Зарабатывайте бонусы за быстрые ответы и серии правильных слов! Собирайте золотые снежинки!</p>
                         <button id="speedMode" class="btn btn-danger">Играть</button>
                     </div>
                 </div>
@@ -582,6 +642,8 @@
                 <div id="affirmation" class="affirmation"></div>
                 <div class="stats">
                     <div>❄️ Снежинок собрано: <span id="levelScore">0</span></div>
+                    <div>💰 Бонусные очки: <span id="bonusScore">0</span></div>
+                    <div>🌟 Золотых снежинок: <span id="goldenScore">0</span></div>
                     <div>🎯 Следующий уровень: <span id="nextLevelInfo"></span></div>
                 </div>
                 <button id="nextLevelBtn" class="btn btn-success">❄️ Продолжить</button>
@@ -594,8 +656,11 @@
                 <h1>💀 ИГРА ОКОНЧЕНА</h1>
                 <div class="stats">
                     <div>❄️ Снежинок собрано: <span id="finalSnowflakes">0</span></div>
+                    <div>💰 Бонусные очки: <span id="finalBonus">0</span></div>
+                    <div>🌟 Золотых снежинок: <span id="finalGolden">0</span></div>
                     <div>🎯 Уровень: <span id="finalLevel">1</span></div>
                     <div>📝 Всего слов: <span id="totalWordsCompleted">0</span></div>
+                    <div>🔥 Лучшая серия: <span id="bestStreak">0</span></div>
                 </div>
                 <button id="playAgainBtn" class="btn btn-success">🔄 Играть снова</button>
                 <button id="changeModeGameOver" class="btn">🎮 Сменить режим</button>
@@ -604,7 +669,6 @@
     </div>
 
     <script>
-        // Исправленный словарь слов
         const vocabulary = [
             {word: "дебаты", masked: "д_баты", missing: ["е"]},
             {word: "декларация", masked: "д_кл_рация", missing: ["е", "а"]},
@@ -634,7 +698,6 @@
             {word: "дисциплинировать", masked: "д_сциплинировать", missing: ["и"]}
         ];
 
-        // Аффирмации для перехода уровней
         const affirmations = [
             "Ты собрал снегопад знаний! ❄️",
             "С каждым уровнем твоя грамотность растет! 📚",
@@ -669,8 +732,22 @@
                 this.usedWords = new Set();
                 this.needClickSelection = false;
                 
+                // Новые свойства для бонусов
+                this.streak = 0;
+                this.bestStreak = 0;
+                this.bonusPoints = 0;
+                this.quickAnswers = 0;
+                this.goldenSnowflakes = 0;
+                this.goldenSnowflakeActive = false;
+                this.lastAnswerTime = 0;
+                this.comets = [];
+                this.clouds = [];
+                this.stars = [];
+                this.moon = { x: 100, y: 100, size: 40, phase: 0.8 };
+                this.goldenTimer = 0;
+                
                 this.setupEventListeners();
-                this.createBackgroundSnowflakes();
+                this.createBackground();
                 if (this.isMobile) {
                     this.createMobileKeyboard();
                 }
@@ -684,6 +761,7 @@
             resizeCanvas() {
                 this.canvas.width = window.innerWidth;
                 this.canvas.height = window.innerHeight;
+                this.createBackground();
             }
 
             setupEventListeners() {
@@ -722,14 +800,25 @@
                 this.learnedWords.clear();
                 this.usedWords.clear();
                 
+                // Сброс бонусов
+                this.streak = 0;
+                this.bonusPoints = 0;
+                this.quickAnswers = 0;
+                this.goldenSnowflakes = 0;
+                this.goldenSnowflakeActive = false;
+                this.lastAnswerTime = 0;
+                
                 if (mode === 'knowledge') {
                     this.maxWordsOnScreen = 1;
                     this.spawnTimer = 120;
                     this.needClickSelection = false;
+                    document.getElementById('bonusPanel').classList.add('hidden');
                 } else {
                     this.maxWordsOnScreen = 2;
                     this.spawnTimer = 90;
                     this.needClickSelection = true;
+                    document.getElementById('bonusPanel').classList.remove('hidden');
+                    this.goldenTimer = Math.random() * 300 + 600;
                 }
                 
                 document.getElementById('gameMode').textContent = mode === 'knowledge' ? 'Проверка' : 'Скорость';
@@ -737,6 +826,70 @@
                 document.getElementById('modeSelection').classList.add('hidden');
                 
                 this.updateUI();
+            }
+
+            createBackground() {
+                // Создание звезд
+                this.stars = [];
+                for (let i = 0; i < 150; i++) {
+                    this.stars.push({
+                        x: Math.random() * this.canvas.width,
+                        y: Math.random() * (this.canvas.height * 0.7),
+                        size: Math.random() * 1.5 + 0.5,
+                        brightness: Math.random() * 0.8 + 0.2,
+                        twinkleSpeed: Math.random() * 0.05 + 0.02,
+                        twinkleOffset: Math.random() * Math.PI * 2
+                    });
+                }
+                
+                // Создание облаков
+                this.clouds = [];
+                for (let i = 0; i < 5; i++) {
+                    this.clouds.push({
+                        x: Math.random() * this.canvas.width,
+                        y: Math.random() * 250,
+                        size: Math.random() * 40 + 60,
+                        speed: Math.random() * 0.2 + 0.1,
+                        opacity: Math.random() * 0.3 + 0.1
+                    });
+                }
+                
+                // Создание фоновых снежинок
+                this.snowflakes = [];
+                for (let i = 0; i < 50; i++) {
+                    this.snowflakes.push({
+                        x: Math.random() * this.canvas.width,
+                        y: Math.random() * this.canvas.height,
+                        size: Math.random() * 3 + 1,
+                        speed: Math.random() * 0.5 + 0.2,
+                        opacity: Math.random() * 0.4 + 0.1,
+                        sway: Math.random() * 0.5 - 0.25,
+                        swaySpeed: Math.random() * 0.02 + 0.01,
+                        rotation: Math.random() * Math.PI * 2
+                    });
+                }
+            }
+
+            createGoldenSnowflake() {
+                if (this.gameMode !== 'speed' || this.goldenSnowflakeActive) return;
+                
+                const x = Math.random() * (this.canvas.width - 200) + 100;
+                const speed = 2 + this.level * 0.3;
+                
+                // ВЫБИРАЕМ РАНДОМНОЕ СЛОВО ИЗ СЛОВАРЯ ДЛЯ ЗОЛОТОЙ СНЕЖИНКИ
+                const randomWordData = vocabulary[Math.floor(Math.random() * vocabulary.length)];
+                
+                const goldenWord = {
+                    word: randomWordData.word,
+                    masked: randomWordData.masked,
+                    missing: randomWordData.missing,
+                    isGolden: true
+                };
+                
+                const newWord = new SnowflakeWord(goldenWord, x, -80, speed, this.ctx);
+                newWord.isGolden = true;
+                this.words.push(newWord);
+                this.goldenSnowflakeActive = true;
             }
 
             showModeSelection() {
@@ -749,31 +902,33 @@
                 const dictionaryElement = document.getElementById('dictionaryWords');
                 dictionaryElement.innerHTML = '';
                 
-                vocabulary.forEach(wordData => {
+                // Убираем дублирование, используем Set для уникальных слов
+                const uniqueWords = [...new Set(vocabulary.map(w => w.word))];
+                
+                uniqueWords.forEach(word => {
+                    const wordData = vocabulary.find(w => w.word === word);
                     const div = document.createElement('div');
-                    div.className = `word-item ${this.learnedWords.has(wordData.word) ? '' : 'revision-word'}`;
-                    // ИСПРАВЛЕНИЕ: убираем HTML из словаря
-                    div.textContent = this.getDictionaryText(wordData);
+                    div.className = `word-item ${this.learnedWords.has(word) ? '' : 'revision-word'}`;
+                    
+                    // Формируем текст с выделением правильных букв зеленым
+                    let displayText = '';
+                    let gapIndex = 0;
+                    
+                    for (let i = 0; i < wordData.masked.length; i++) {
+                        if (wordData.masked[i] === '_') {
+                            const correctLetter = wordData.missing[gapIndex];
+                            displayText += `<span class="correct-letter">${correctLetter}</span>`;
+                            gapIndex++;
+                        } else {
+                            displayText += wordData.masked[i];
+                        }
+                    }
+                    
+                    div.innerHTML = `<strong>${wordData.word}</strong><br>${displayText}`;
                     dictionaryElement.appendChild(div);
                 });
                 
                 this.showScreen('dictionaryScreen');
-            }
-
-            getDictionaryText(wordData) {
-                let result = '';
-                let gapIndex = 0;
-                
-                for (let i = 0; i < wordData.masked.length; i++) {
-                    if (wordData.masked[i] === '_') {
-                        const correctLetter = wordData.missing[gapIndex];
-                        result += correctLetter;
-                        gapIndex++;
-                    } else {
-                        result += wordData.masked[i];
-                    }
-                }
-                return wordData.word + ' → ' + result;
             }
 
             hideDictionary() {
@@ -829,8 +984,13 @@
                 const zoomedElement = document.getElementById('zoomedWord');
                 const textElement = document.getElementById('zoomedWordText');
                 
-                // ИСПРАВЛЕНИЕ: используем textContent вместо innerHTML
-                textElement.textContent = this.createZoomedDisplayText(word);
+                // Для золотой снежинки показываем слово с отметкой бонуса
+                if (word.isGolden) {
+                    const displayText = this.createZoomedDisplayText(word);
+                    textElement.innerHTML = `<span class="golden-snowflake">${displayText}<br>★ БОНУС ★</span>`;
+                } else {
+                    textElement.textContent = this.createZoomedDisplayText(word);
+                }
                 zoomedElement.classList.remove('hidden');
             }
 
@@ -878,14 +1038,52 @@
                 }
                 
                 if (targetWord) {
+                    const currentTime = Date.now();
+                    const timeSinceLastAnswer = currentTime - this.lastAnswerTime;
+                    this.lastAnswerTime = currentTime;
+                    
                     if (targetWord.processInput(letter)) {
+                        // Начисление бонусов для режима скорости
+                        if (this.gameMode === 'speed') {
+                            // Бонус за быстрый ответ (менее 2 секунд)
+                            if (timeSinceLastAnswer < 2000 && this.lastAnswerTime !== 0) {
+                                this.bonusPoints += 5;
+                                this.quickAnswers++;
+                                this.createBonusText(targetWord.x, targetWord.y, "+5⚡");
+                            }
+                            
+                            // Бонус за серию правильных ответов
+                            this.streak++;
+                            if (this.streak > this.bestStreak) {
+                                this.bestStreak = this.streak;
+                            }
+                            
+                            // Бонусы за длинные серии
+                            if (this.streak % 5 === 0) {
+                                const streakBonus = this.streak * 2;
+                                this.bonusPoints += streakBonus;
+                                this.createBonusText(targetWord.x, targetWord.y - 30, `+${streakBonus}🔥`);
+                            }
+                        }
+                        
                         if (targetWord.completed) {
+                            // Особый бонус для золотой снежинки - ТОЛЬКО КОГДА ОНА ПОЛНОСТЬЮ ЗАПОЛНЕНА
+                            if (targetWord.isGolden) {
+                                this.goldenSnowflakes++;
+                                this.bonusPoints += 50;
+                                this.createBonusText(targetWord.x, targetWord.y - 60, "+50🌟");
+                                this.goldenSnowflakeActive = false;
+                            }
                             this.handleWordCompleted(targetWord);
                         } else if (this.isMobile && this.needClickSelection) {
                             this.showZoomedWord(targetWord);
                         }
                         return true;
                     } else {
+                        // Сброс серии при ошибке
+                        if (this.gameMode === 'speed') {
+                            this.streak = 0;
+                        }
                         this.handleWordError(targetWord);
                         return false;
                     }
@@ -893,15 +1091,29 @@
                 return false;
             }
 
+            createBonusText(x, y, text) {
+                this.particles.push({
+                    x: x,
+                    y: y,
+                    text: text,
+                    life: 1.0,
+                    speed: -1,
+                    color: text.includes('🌟') ? '#FFD700' : text.includes('🔥') ? '#FF6347' : '#87CEEB'
+                });
+            }
+
             handleWordCompleted(word) {
-                // Запускаем анимацию взрыва и создаем частицы
                 word.startExplodeAnimation();
-                this.createSnowExplosion(word.x, word.y, 20);
+                // Разный цвет взрыва для золотой снежинки
+                const particleColor = word.isGolden ? '#FFD700' : '#87CEEB';
+                this.createSnowExplosion(word.x, word.y, word.isGolden ? 35 : 20, particleColor);
                 
                 setTimeout(() => {
                     this.wordsCompleted++;
                     this.totalWordsCompleted++;
-                    this.learnedWords.add(word.originalData.word);
+                    if (!word.isGolden) {
+                        this.learnedWords.add(word.originalData.word);
+                    }
                     this.words = this.words.filter(w => w !== word);
                     
                     if (this.isMobile && this.needClickSelection) {
@@ -979,6 +1191,8 @@
                 document.getElementById('affirmation').textContent = 
                     affirmations[Math.floor(Math.random() * affirmations.length)];
                 document.getElementById('levelScore').textContent = this.totalWordsCompleted;
+                document.getElementById('bonusScore').textContent = this.bonusPoints;
+                document.getElementById('goldenScore').textContent = this.goldenSnowflakes;
                 document.getElementById('nextLevelInfo').textContent = 
                     `Слов одновременно: ${this.maxWordsOnScreen}, Скорость: +${this.level * 40}%`;
                 
@@ -996,9 +1210,9 @@
                 }
             }
 
-            createSnowExplosion(x, y, count) {
+            createSnowExplosion(x, y, count, color = '#87CEEB') {
                 for (let i = 0; i < count; i++) {
-                    this.particles.push(new SnowParticle(x, y, this.ctx));
+                    this.particles.push(new SnowParticle(x, y, this.ctx, color));
                 }
             }
 
@@ -1021,22 +1235,6 @@
                 this.showScreen('pauseScreen');
             }
 
-            highlightWord(wordData) {
-                let result = '';
-                let gapIndex = 0;
-                
-                for (let i = 0; i < wordData.masked.length; i++) {
-                    if (wordData.masked[i] === '_') {
-                        const correctLetter = wordData.missing[gapIndex];
-                        result += `<span class="correct-letter">${correctLetter}</span>`;
-                        gapIndex++;
-                    } else {
-                        result += wordData.masked[i];
-                    }
-                }
-                return wordData.word + ' → ' + result;
-            }
-
             showScreen(screenId) {
                 document.querySelectorAll('#pauseScreen, #gameOverScreen, #levelUpScreen, #dictionaryScreen')
                     .forEach(screen => screen.classList.add('hidden'));
@@ -1056,6 +1254,41 @@
             update() {
                 if (this.gameState !== 'playing') return;
 
+                // Обновление облаков
+                this.clouds.forEach(cloud => {
+                    cloud.x += cloud.speed;
+                    if (cloud.x > this.canvas.width + cloud.size) {
+                        cloud.x = -cloud.size;
+                    }
+                });
+
+                // Обновление комет
+                this.comets.forEach((comet, index) => {
+                    comet.x += comet.speedX;
+                    comet.y += comet.speedY;
+                    comet.life -= 0.01;
+                    
+                    if (comet.life <= 0 || comet.x < -100 || comet.x > this.canvas.width + 100 || 
+                        comet.y < -100 || comet.y > this.canvas.height + 100) {
+                        this.comets.splice(index, 1);
+                    }
+                });
+
+                // Случайное появление кометы
+                if (Math.random() < 0.001) {
+                    this.createComet();
+                }
+
+                // Таймер для золотой снежинки
+                if (this.gameMode === 'speed' && !this.goldenSnowflakeActive) {
+                    this.goldenTimer--;
+                    if (this.goldenTimer <= 0) {
+                        this.createGoldenSnowflake();
+                        this.goldenTimer = Math.random() * 300 + 600;
+                    }
+                }
+
+                // Обновление слов
                 this.words.forEach(word => {
                     if (word.update()) {
                         if (word.y >= this.canvas.height - 60 && !word.completed && !word.exploding) {
@@ -1064,28 +1297,63 @@
                     }
                 });
                 
+                // Обновление фоновых снежинок
                 this.snowflakes.forEach(flake => {
                     flake.y += flake.speed;
+                    flake.x += flake.sway * Math.sin(flake.y * flake.swaySpeed);
+                    flake.rotation += 0.01;
+                    
                     if (flake.y > this.canvas.height) {
                         flake.y = 0;
                         flake.x = Math.random() * this.canvas.width;
                     }
                 });
                 
+                // Спавн новых слов
                 this.spawnTimer--;
                 if (this.spawnTimer <= 0) {
                     this.spawnWord();
                     this.spawnTimer = this.gameMode === 'knowledge' ? 180 : 100 - (this.level * 8);
                 }
                 
-                this.particles = this.particles.filter(particle => particle.update());
+                // Обновление частиц и бонусных текстов
+                this.particles = this.particles.filter(particle => {
+                    if (particle.update) {
+                        return particle.update();
+                    } else {
+                        // Для бонусных текстов
+                        particle.y += particle.speed;
+                        particle.life -= 0.02;
+                        return particle.life > 0;
+                    }
+                });
                 
+                // Проверка условия проигрыша для режима скорости
                 if (this.gameMode === 'speed' && this.stoppedWords.length >= 10) {
                     this.gameOver(false);
                 }
             }
 
+            createComet() {
+                const startX = Math.random() < 0.5 ? -50 : this.canvas.width + 50;
+                const startY = Math.random() * this.canvas.height * 0.5;
+                
+                this.comets.push({
+                    x: startX,
+                    y: startY,
+                    speedX: startX < 0 ? Math.random() * 3 + 2 : -Math.random() * 3 - 2,
+                    speedY: Math.random() * 1 - 0.5,
+                    size: Math.random() * 3 + 2,
+                    life: 1.0,
+                    color: '#A3D9FF'
+                });
+            }
+
             handleFallenWord(word) {
+                if (word.isGolden) {
+                    this.goldenSnowflakeActive = false;
+                }
+                
                 if (this.gameMode === 'speed') {
                     word.y = this.canvas.height - 60 - (this.stoppedWords.length * 70);
                     word.speed = 0;
@@ -1112,8 +1380,11 @@
 
             gameOver(isVictory) {
                 document.getElementById('finalSnowflakes').textContent = this.totalWordsCompleted;
+                document.getElementById('finalBonus').textContent = this.bonusPoints;
+                document.getElementById('finalGolden').textContent = this.goldenSnowflakes;
                 document.getElementById('finalLevel').textContent = this.level;
                 document.getElementById('totalWordsCompleted').textContent = this.totalWordsCompleted;
+                document.getElementById('bestStreak').textContent = this.bestStreak;
                 
                 if (isVictory) {
                     document.querySelector('#gameOverScreen h1').textContent = '🎉 ПОБЕДА!';
@@ -1130,6 +1401,14 @@
                 document.getElementById('level').textContent = this.level;
                 document.getElementById('wordsCompleted').textContent = this.wordsCompleted;
                 document.getElementById('revisionCount').textContent = this.wordsForRevision.length;
+                document.getElementById('streakCounter').textContent = this.streak;
+                
+                // Обновление бонусной панели
+                if (this.gameMode === 'speed') {
+                    document.getElementById('bonusPoints').textContent = this.bonusPoints;
+                    document.getElementById('goldenCount').textContent = this.goldenSnowflakes;
+                    document.getElementById('quickAnswers').textContent = this.quickAnswers;
+                }
                 
                 const progress = this.gameMode === 'knowledge' ? 
                     (this.wordsCompleted / vocabulary.length) * 100 : 
@@ -1137,42 +1416,167 @@
                 document.getElementById('levelProgress').style.width = progress + '%';
             }
 
-            createBackgroundSnowflakes() {
-                for (let i = 0; i < 25; i++) {
-                    this.snowflakes.push({
-                        x: Math.random() * this.canvas.width,
-                        y: Math.random() * this.canvas.height,
-                        size: Math.random() * 2 + 1,
-                        speed: Math.random() * 0.3 + 0.1,
-                        opacity: Math.random() * 0.2 + 0.1
-                    });
-                }
-            }
-
             draw() {
+                // Очистка холста
                 this.ctx.fillStyle = '#0a141e';
                 this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
                 
+                // Рисование звезд с мерцанием
+                const currentTime = Date.now() * 0.001;
+                this.stars.forEach(star => {
+                    const twinkle = Math.sin(currentTime * star.twinkleSpeed + star.twinkleOffset) * 0.3 + 0.7;
+                    this.ctx.fillStyle = `rgba(255, 255, 255, ${star.brightness * twinkle * 0.8})`;
+                    this.ctx.beginPath();
+                    this.ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                    this.ctx.fill();
+                });
+                
+                // Рисование луны
+                this.drawMoon();
+                
+                // Рисование облаков
+                this.clouds.forEach(cloud => {
+                    this.ctx.fillStyle = `rgba(150, 170, 200, ${cloud.opacity})`;
+                    this.drawCloud(cloud.x, cloud.y, cloud.size);
+                });
+                
+                // Рисование комет
+                this.comets.forEach(comet => {
+                    this.ctx.save();
+                    this.ctx.globalAlpha = comet.life;
+                    this.ctx.fillStyle = comet.color;
+                    this.ctx.beginPath();
+                    this.ctx.arc(comet.x, comet.y, comet.size, 0, Math.PI * 2);
+                    this.ctx.fill();
+                    
+                    // Хвост кометы
+                    const gradient = this.ctx.createLinearGradient(
+                        comet.x, comet.y,
+                        comet.x - comet.speedX * 20, comet.y - comet.speedY * 20
+                    );
+                    gradient.addColorStop(0, `rgba(163, 217, 255, ${comet.life * 0.5})`);
+                    gradient.addColorStop(1, 'transparent');
+                    
+                    this.ctx.fillStyle = gradient;
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(comet.x, comet.y);
+                    this.ctx.lineTo(comet.x - comet.speedX * 20, comet.y - comet.speedY * 20);
+                    this.ctx.lineTo(comet.x - comet.speedX * 20 + 5, comet.y - comet.speedY * 20);
+                    this.ctx.closePath();
+                    this.ctx.fill();
+                    this.ctx.restore();
+                });
+                
+                // Рисование фоновых снежинок
                 this.drawBackgroundSnowflakes();
                 
+                // Рисование остановившихся слов
                 this.stoppedWords.forEach(word => word.drawStopped());
                 
+                // Рисование активных слов
                 this.words.forEach(word => {
                     word.isSelected = (word === this.selectedWord);
                     word.draw();
                 });
                 
-                this.particles.forEach(particle => particle.draw());
+                // Рисование частиц и бонусных текстов
+                this.particles.forEach(particle => {
+                    if (particle.draw) {
+                        particle.draw();
+                    } else {
+                        // Рисование бонусных текстов
+                        this.ctx.save();
+                        this.ctx.globalAlpha = particle.life;
+                        this.ctx.fillStyle = particle.color;
+                        this.ctx.font = 'bold 24px Montserrat';
+                        this.ctx.textAlign = 'center';
+                        this.ctx.fillText(particle.text, particle.x, particle.y);
+                        this.ctx.restore();
+                    }
+                });
+            }
+
+            drawMoon() {
+                // Внешнее свечение
+                const glow = this.ctx.createRadialGradient(
+                    this.moon.x, this.moon.y, 0,
+                    this.moon.x, this.moon.y, this.moon.size * 3
+                );
+                glow.addColorStop(0, 'rgba(255, 255, 220, 0.2)');
+                glow.addColorStop(1, 'rgba(255, 255, 220, 0)');
+                
+                this.ctx.fillStyle = glow;
+                this.ctx.beginPath();
+                this.ctx.arc(this.moon.x, this.moon.y, this.moon.size * 3, 0, Math.PI * 2);
+                this.ctx.fill();
+
+                // Основная часть луны
+                this.ctx.fillStyle = '#F8F8D8';
+                this.ctx.beginPath();
+                this.ctx.arc(this.moon.x, this.moon.y, this.moon.size, 0, Math.PI * 2);
+                this.ctx.fill();
+
+                // Кратеры на луне
+                this.ctx.fillStyle = '#E8E8C8';
+                this.ctx.beginPath();
+                this.ctx.arc(this.moon.x - 12, this.moon.y - 8, 6, 0, Math.PI * 2);
+                this.ctx.arc(this.moon.x + 10, this.moon.y + 6, 4, 0, Math.PI * 2);
+                this.ctx.arc(this.moon.x + 5, this.moon.y - 12, 3, 0, Math.PI * 2);
+                this.ctx.fill();
+            }
+
+            drawCloud(x, y, size) {
+                this.ctx.save();
+                this.ctx.translate(x, y);
+                
+                this.ctx.beginPath();
+                this.ctx.arc(0, 0, size * 0.6, 0, Math.PI * 2);
+                this.ctx.arc(size * 0.8, -size * 0.3, size * 0.7, 0, Math.PI * 2);
+                this.ctx.arc(size * 1.4, size * 0.1, size * 0.6, 0, Math.PI * 2);
+                this.ctx.arc(size * 0.9, size * 0.4, size * 0.5, 0, Math.PI * 2);
+                this.ctx.fill();
+                
+                this.ctx.restore();
             }
 
             drawBackgroundSnowflakes() {
                 this.snowflakes.forEach(flake => {
                     this.ctx.save();
+                    this.ctx.translate(flake.x, flake.y);
+                    this.ctx.rotate(flake.rotation);
                     this.ctx.globalAlpha = flake.opacity;
-                    this.ctx.fillStyle = '#87CEEB';
-                    this.ctx.beginPath();
-                    this.ctx.arc(flake.x, flake.y, flake.size, 0, Math.PI * 2);
-                    this.ctx.fill();
+                    
+                    this.ctx.strokeStyle = 'rgba(200, 220, 255, 0.8)';
+                    this.ctx.lineWidth = 1;
+                    this.ctx.lineCap = 'round';
+                    
+                    // Снежинка с закругленными краями
+                    for (let i = 0; i < 6; i++) {
+                        this.ctx.rotate(Math.PI / 3);
+                        
+                        // Основной луч с закруглением на конце
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(0, 0);
+                        this.ctx.lineTo(0, flake.size * 4);
+                        this.ctx.stroke();
+                        
+                        // Боковые ответвления
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(0, flake.size);
+                        this.ctx.lineTo(-flake.size * 1.5, flake.size * 2);
+                        this.ctx.moveTo(0, flake.size);
+                        this.ctx.lineTo(flake.size * 1.5, flake.size * 2);
+                        this.ctx.stroke();
+                        
+                        // Верхние ответвления
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(0, flake.size * 3);
+                        this.ctx.lineTo(-flake.size, flake.size * 2.5);
+                        this.ctx.moveTo(0, flake.size * 3);
+                        this.ctx.lineTo(flake.size, flake.size * 2.5);
+                        this.ctx.stroke();
+                    }
+                    
                     this.ctx.restore();
                 });
             }
@@ -1207,6 +1611,7 @@
                 this.isSelected = false;
                 this.hoverAlpha = 0.3;
                 this.gapBlinkTimer = 0;
+                this.isGolden = wordData.isGolden || false;
                 
                 this.gapPositions = this.findGapPositions();
             }
@@ -1286,7 +1691,6 @@
                 this.ctx.translate(this.x, this.y);
                 
                 if (this.exploding) {
-                    // Анимация взрыва - увеличение, вращение и исчезновение
                     const scale = 1 + this.explodeProgress;
                     const rotation = this.rotation + this.explodeProgress * Math.PI * 2;
                     const alpha = 1 - this.explodeProgress;
@@ -1316,44 +1720,89 @@
 
             drawSnowflakeShape() {
                 const alpha = this.isSelected ? 1 : 0.6;
+                const color = this.isGolden ? '#FFD700' : `rgba(135, 206, 235, ${alpha})`;
+                const lineWidth = this.isSelected ? 4 : this.isGolden ? 3 : 2;
                 
-                this.ctx.strokeStyle = `rgba(135, 206, 235, ${alpha})`;
-                this.ctx.lineWidth = this.isSelected ? 3 : 2;
+                if (this.isGolden) {
+                    // Анимация свечения для золотой снежинки
+                    const glowIntensity = 0.7 + 0.3 * Math.sin(Date.now() * 0.005);
+                    this.ctx.shadowColor = 'rgba(255, 215, 0, 0.7)';
+                    this.ctx.shadowBlur = 10 * glowIntensity;
+                }
+                
+                this.ctx.strokeStyle = color;
+                this.ctx.lineWidth = lineWidth;
+                this.ctx.lineCap = 'round';
                 this.ctx.globalAlpha = alpha;
                 
+                // Улучшенная снежинка с закругленными краями
                 for (let i = 0; i < 6; i++) {
                     this.ctx.rotate(Math.PI / 3);
+                    
+                    // Основной луч с закруглением на конце
                     this.ctx.beginPath();
                     this.ctx.moveTo(0, 0);
                     this.ctx.lineTo(0, 50);
                     this.ctx.stroke();
                     
+                    // Верхние боковые ответвления
                     this.ctx.beginPath();
                     this.ctx.moveTo(0, 15);
-                    this.ctx.lineTo(-12, 25);
+                    this.ctx.lineTo(-12, 20);
                     this.ctx.moveTo(0, 15);
-                    this.ctx.lineTo(12, 25);
+                    this.ctx.lineTo(12, 20);
                     this.ctx.stroke();
+                    
+                    // Нижние боковые ответвления
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(0, 35);
+                    this.ctx.lineTo(-10, 45);
+                    this.ctx.moveTo(0, 35);
+                    this.ctx.lineTo(10, 45);
+                    this.ctx.stroke();
+                    
+                    // Украшения на концах лучей
+                    this.ctx.beginPath();
+                    this.ctx.arc(0, 50, 3, 0, Math.PI * 2);
+                    this.ctx.fill();
                 }
                 
+                // Центральный круг
+                this.ctx.fillStyle = color;
+                this.ctx.beginPath();
+                this.ctx.arc(0, 0, this.isGolden ? 6 : 4, 0, Math.PI * 2);
+                this.ctx.fill();
+                
                 this.ctx.globalAlpha = 1;
+                this.ctx.shadowBlur = 0;
             }
 
             drawWordText() {
                 const displayText = this.getDisplayText();
-                const fontSize = 20;
+                const fontSize = this.isGolden ? 24 : 20;
                 const alpha = this.isSelected ? 1 : 0.7;
+                const textColor = this.isGolden ? '#FFD700' : `rgba(255, 255, 255, ${alpha})`;
+                const shadowColor = this.isGolden ? 'rgba(255, 215, 0, 0.7)' : `rgba(0, 0, 0, ${alpha})`;
                 
                 this.ctx.font = `600 ${fontSize}px 'Montserrat', sans-serif`;
                 this.ctx.textAlign = 'center';
                 this.ctx.textBaseline = 'middle';
                 
-                this.ctx.strokeStyle = `rgba(0, 0, 0, ${alpha})`;
-                this.ctx.lineWidth = 4;
+                // Тень для текста
+                this.ctx.strokeStyle = shadowColor;
+                this.ctx.lineWidth = this.isGolden ? 6 : 4;
                 this.ctx.strokeText(displayText, 0, 0);
                 
-                this.ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+                // Основной текст
+                this.ctx.fillStyle = textColor;
                 this.ctx.fillText(displayText, 0, 0);
+                
+                // Дополнительная надпись для золотой снежинки
+                if (this.isGolden) {
+                    this.ctx.font = `bold 14px 'Montserrat', sans-serif`;
+                    this.ctx.fillStyle = '#FFD700';
+                    this.ctx.fillText('★ БОНУС ★', 0, 25);
+                }
             }
 
             getDisplayText() {
@@ -1411,7 +1860,7 @@
         }
 
         class SnowParticle {
-            constructor(x, y, ctx) {
+            constructor(x, y, ctx, color = '#87CEEB') {
                 this.x = x;
                 this.y = y;
                 this.size = Math.random() * 5 + 2;
@@ -1421,6 +1870,7 @@
                 this.ctx = ctx;
                 this.rotation = Math.random() * Math.PI * 2;
                 this.rotationSpeed = (Math.random() - 0.5) * 0.1;
+                this.color = color;
             }
 
             update() {
@@ -1438,14 +1888,24 @@
                 this.ctx.rotate(this.rotation);
                 this.ctx.globalAlpha = this.life;
                 
-                this.ctx.strokeStyle = '#87CEEB';
+                this.ctx.strokeStyle = this.color;
                 this.ctx.lineWidth = 2;
+                this.ctx.lineCap = 'round';
                 
+                // Улучшенная частица снежинки
                 for (let i = 0; i < 6; i++) {
                     this.ctx.rotate(Math.PI / 3);
                     this.ctx.beginPath();
                     this.ctx.moveTo(0, 0);
                     this.ctx.lineTo(0, this.size * 2);
+                    this.ctx.stroke();
+                    
+                    // Маленькие боковые веточки
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(0, this.size);
+                    this.ctx.lineTo(-this.size * 0.7, this.size * 1.3);
+                    this.ctx.moveTo(0, this.size);
+                    this.ctx.lineTo(this.size * 0.7, this.size * 1.3);
                     this.ctx.stroke();
                 }
                 
