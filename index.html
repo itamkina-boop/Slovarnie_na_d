@@ -43,56 +43,64 @@
 
         .panel {
             background: rgba(30, 40, 50, 0.9);
-            padding: 15px 25px;
-            border-radius: 20px;
+            padding: 12px 18px;
+            border-radius: 16px;
             border: 2px solid #87CEEB;
-            margin: 20px;
+            margin: 15px;
             pointer-events: auto;
             backdrop-filter: blur(10px);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            font-size: 14px;
         }
 
         #scorePanel {
             position: absolute;
-            top: 20px;
-            left: 20px;
+            top: 15px;
+            left: 15px;
+            min-width: 160px;
         }
 
         #levelPanel {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 15px;
+            right: 15px;
             text-align: right;
+            min-width: 160px;
         }
 
         #progressPanel {
             position: absolute;
-            bottom: 20px;
+            bottom: 15px;
             left: 50%;
             transform: translateX(-50%);
-            min-width: 300px;
+            width: 300px;
+            max-width: 80%;
             text-align: center;
         }
 
         #pauseBtn {
             position: absolute;
-            top: 20px;
+            top: 15px;
             left: 50%;
             transform: translateX(-50%);
+            padding: 10px 20px;
+            font-size: 14px;
         }
 
         #dictionaryBtn {
             position: absolute;
-            top: 20px;
-            left: calc(50% + 120px);
+            bottom: 15px;
+            right: 15px;
+            padding: 10px 20px;
+            font-size: 14px;
         }
 
         .progress-bar {
             width: 100%;
-            height: 10px;
+            height: 8px;
             background: #34495e;
-            border-radius: 5px;
-            margin-top: 10px;
+            border-radius: 4px;
+            margin-top: 8px;
             overflow: hidden;
             box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
         }
@@ -100,29 +108,28 @@
         .progress-fill {
             height: 100%;
             background: linear-gradient(90deg, #87CEEB, #4682B4);
-            border-radius: 5px;
+            border-radius: 4px;
             transition: width 0.3s ease;
-            box-shadow: 0 0 10px rgba(135, 206, 235, 0.5);
+            box-shadow: 0 0 8px rgba(135, 206, 235, 0.5);
         }
 
         .btn {
             background: linear-gradient(45deg, #87CEEB, #4682B4);
             color: white;
             border: none;
-            padding: 14px 28px;
-            border-radius: 25px;
+            padding: 12px 24px;
+            border-radius: 20px;
             font-family: 'Montserrat', sans-serif;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             pointer-events: auto;
             transition: all 0.3s ease;
-            margin: 8px;
             box-shadow: 0 4px 15px rgba(135, 206, 235, 0.3);
         }
 
         .btn:hover {
-            transform: translateY(-3px);
+            transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(135, 206, 235, 0.4);
         }
 
@@ -146,12 +153,12 @@
             left: 0;
             width: 100%;
             background: rgba(30, 40, 50, 0.95);
-            padding: 15px;
+            padding: 10px;
             display: none;
             grid-template-columns: repeat(10, 1fr);
-            gap: 8px;
+            gap: 6px;
             z-index: 1000;
-            border-top: 3px solid #87CEEB;
+            border-top: 2px solid #87CEEB;
             backdrop-filter: blur(10px);
         }
 
@@ -159,10 +166,10 @@
             background: linear-gradient(45deg, #87CEEB, #4682B4);
             color: white;
             border: none;
-            padding: 14px 8px;
-            border-radius: 12px;
+            padding: 12px 6px;
+            border-radius: 10px;
             font-family: 'Montserrat', sans-serif;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             text-align: center;
@@ -182,31 +189,31 @@
             left: 50%;
             transform: translate(-50%, -50%);
             background: rgba(30, 40, 50, 0.95);
-            padding: 35px;
-            border-radius: 25px;
+            padding: 25px;
+            border-radius: 20px;
             border: 3px solid #87CEEB;
             font-family: 'Montserrat', sans-serif;
-            font-size: 36px;
+            font-size: 28px;
             font-weight: 600;
             text-align: center;
             z-index: 999;
             display: none;
-            min-width: 320px;
+            min-width: 280px;
             backdrop-filter: blur(10px);
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
         }
 
         #zoomedWord .word-text {
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             line-height: 1.4;
             letter-spacing: 1px;
         }
 
         #zoomedWord .hint {
             font-family: 'Nunito', sans-serif;
-            font-size: 18px;
+            font-size: 16px;
             color: #87CEEB;
-            margin-top: 15px;
+            margin-top: 10px;
             font-weight: 400;
         }
 
@@ -226,26 +233,26 @@
 
         .mode-card {
             background: rgba(30, 40, 50, 0.95);
-            padding: 40px;
-            border-radius: 25px;
+            padding: 30px;
+            border-radius: 20px;
             border: 3px solid #87CEEB;
             text-align: center;
-            margin: 20px;
-            max-width: 500px;
+            margin: 15px;
+            max-width: 450px;
             backdrop-filter: blur(10px);
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
         }
 
         .mode-card h2 {
             color: #87CEEB;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             font-family: 'Montserrat', sans-serif;
-            font-size: 28px;
+            font-size: 22px;
         }
 
         .mode-card p {
-            margin-bottom: 25px;
-            font-size: 18px;
+            margin-bottom: 20px;
+            font-size: 16px;
             line-height: 1.5;
         }
 
@@ -265,12 +272,12 @@
 
         .screen-content {
             background: rgba(30, 40, 50, 0.95);
-            padding: 45px;
-            border-radius: 25px;
+            padding: 30px;
+            border-radius: 20px;
             border: 3px solid #87CEEB;
             text-align: center;
-            max-width: 700px;
-            max-height: 85vh;
+            max-width: 600px;
+            max-height: 80vh;
             overflow-y: auto;
             backdrop-filter: blur(10px);
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
@@ -279,43 +286,45 @@
         h1 {
             color: #87CEEB;
             font-family: 'Montserrat', sans-serif;
-            font-size: 3em;
-            margin-bottom: 25px;
+            font-size: 2.5em;
+            margin-bottom: 20px;
             text-shadow: 0 0 15px rgba(135, 206, 235, 0.4);
         }
 
         h2 {
             color: #87CEEB;
             font-family: 'Montserrat', sans-serif;
-            margin-bottom: 20px;
-            font-size: 2em;
+            margin-bottom: 15px;
+            font-size: 1.8em;
         }
 
         .word-list {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 12px;
-            margin: 25px 0;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
             text-align: left;
         }
 
         .word-item {
-            padding: 12px 16px;
+            padding: 10px 14px;
             background: rgba(52, 73, 94, 0.6);
             border-radius: 8px;
             border-left: 4px solid #87CEEB;
             font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
             transition: all 0.3s ease;
+            position: relative;
         }
 
-        .word-item:hover {
-            transform: translateX(5px);
-            background: rgba(52, 73, 94, 0.8);
-        }
-
-        .revision-word {
-            border-left-color: #e74c3c;
-            background: rgba(231, 76, 60, 0.15);
+        .word-item.error-word::after {
+            content: "⚠️";
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+            color: #e74c3c;
         }
 
         .correct-letter {
@@ -326,7 +335,7 @@
 
         .current-gap {
             background: rgba(255, 255, 0, 0.4);
-            padding: 3px 6px;
+            padding: 2px 4px;
             border-radius: 4px;
             animation: pulse 1.2s infinite;
             font-weight: bold;
@@ -335,28 +344,28 @@
         @keyframes pulse {
             0%, 100% { 
                 background: rgba(255, 255, 0, 0.4);
-                box-shadow: 0 0 10px rgba(255, 255, 0, 0.3);
+                box-shadow: 0 0 8px rgba(255, 255, 0, 0.3);
             }
             50% { 
                 background: rgba(255, 255, 0, 0.6);
-                box-shadow: 0 0 15px rgba(255, 255, 0, 0.5);
+                box-shadow: 0 0 12px rgba(255, 255, 0, 0.5);
             }
         }
 
         .stats {
-            font-size: 1.3em;
-            margin: 15px 0;
+            font-size: 1.1em;
+            margin: 12px 0;
             font-family: 'Montserrat', sans-serif;
         }
 
         .affirmation {
-            font-size: 1.4em;
+            font-size: 1.2em;
             color: #87CEEB;
             font-style: italic;
-            margin: 25px 0;
-            padding: 20px;
+            margin: 20px 0;
+            padding: 15px;
             background: rgba(135, 206, 235, 0.1);
-            border-radius: 15px;
+            border-radius: 12px;
             border-left: 4px solid #87CEEB;
         }
 
@@ -366,16 +375,16 @@
 
         .bonus-panel {
             position: absolute;
-            top: 90px;
-            left: 20px;
+            top: 80px;
+            left: 15px;
             background: rgba(30, 40, 50, 0.9);
-            padding: 15px 25px;
-            border-radius: 20px;
+            padding: 10px 15px;
+            border-radius: 16px;
             border: 2px solid #FFD700;
             pointer-events: auto;
             backdrop-filter: blur(10px);
             box-shadow: 0 8px 32px rgba(255, 215, 0, 0.3);
-            font-size: 14px;
+            font-size: 12px;
         }
 
         .golden-snowflake {
@@ -399,108 +408,6 @@
             position: absolute;
             background: linear-gradient(90deg, transparent, rgba(255, 255, 200, 0.4));
             border-radius: 50%;
-        }
-
-        @media (max-width: 768px) {
-            .panel {
-                padding: 12px 18px;
-                margin: 15px;
-                font-size: 14px;
-            }
-            
-            #scorePanel {
-                top: 15px;
-                left: 15px;
-            }
-            
-            #levelPanel {
-                top: 15px;
-                right: 15px;
-            }
-            
-            #progressPanel {
-                bottom: 90px;
-                min-width: 280px;
-            }
-            
-            #pauseBtn {
-                top: 15px;
-                left: 50%;
-                transform: translateX(-50%);
-                padding: 12px 24px;
-                font-size: 14px;
-            }
-            
-            #dictionaryBtn {
-                top: 80px;
-                left: 50%;
-                transform: translateX(-50%);
-                padding: 12px 24px;
-            }
-            
-            .btn {
-                padding: 16px 24px;
-                font-size: 16px;
-                margin: 10px;
-            }
-            
-            .screen-content, .mode-card {
-                padding: 25px;
-                margin: 15px;
-            }
-            
-            h1 {
-                font-size: 2.2em;
-            }
-            
-            h2 {
-                font-size: 1.6em;
-            }
-            
-            #mobileKeyboard {
-                display: grid;
-            }
-            
-            .key {
-                padding: 16px 6px;
-                font-size: 20px;
-            }
-            
-            #zoomedWord {
-                font-size: 30px;
-                padding: 25px;
-                min-width: 300px;
-            }
-            
-            .bonus-panel {
-                top: 70px;
-                left: 15px;
-                padding: 10px 15px;
-                font-size: 12px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            #mobileKeyboard {
-                grid-template-columns: repeat(8, 1fr);
-                gap: 6px;
-                padding: 12px;
-            }
-            
-            .key {
-                padding: 14px 4px;
-                font-size: 18px;
-            }
-            
-            #zoomedWord {
-                font-size: 26px;
-                padding: 20px;
-                min-width: 280px;
-            }
-            
-            .word-list {
-                grid-template-columns: 1fr;
-            }
         }
 
         .life {
@@ -547,6 +454,124 @@
                 transform: scale(1.1);
             }
         }
+
+        @media (max-width: 768px) {
+            .panel {
+                padding: 8px 12px;
+                margin: 10px;
+                font-size: 12px;
+                border-radius: 12px;
+            }
+            
+            #scorePanel {
+                top: 10px;
+                left: 10px;
+                min-width: 140px;
+            }
+            
+            #levelPanel {
+                top: 10px;
+                right: 10px;
+                min-width: 140px;
+            }
+            
+            #progressPanel {
+                bottom: 70px;
+                width: 250px;
+            }
+            
+            #pauseBtn {
+                top: 10px;
+                left: 50%;
+                transform: translateX(-50%);
+                padding: 8px 16px;
+                font-size: 12px;
+            }
+            
+            #dictionaryBtn {
+                bottom: 10px;
+                right: 10px;
+                padding: 8px 16px;
+                font-size: 12px;
+            }
+            
+            .btn {
+                padding: 10px 20px;
+                font-size: 12px;
+            }
+            
+            .screen-content, .mode-card {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            h2 {
+                font-size: 1.4em;
+            }
+            
+            #mobileKeyboard {
+                display: grid;
+            }
+            
+            .key {
+                padding: 12px 4px;
+                font-size: 16px;
+            }
+            
+            #zoomedWord {
+                font-size: 24px;
+                padding: 20px;
+                min-width: 250px;
+            }
+            
+            .bonus-panel {
+                top: 60px;
+                left: 10px;
+                padding: 8px 12px;
+                font-size: 10px;
+            }
+            
+            .word-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .word-item {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #mobileKeyboard {
+                grid-template-columns: repeat(8, 1fr);
+                gap: 4px;
+                padding: 8px;
+            }
+            
+            .key {
+                padding: 10px 2px;
+                font-size: 14px;
+            }
+            
+            #zoomedWord {
+                font-size: 20px;
+                padding: 15px;
+                min-width: 220px;
+            }
+            
+            #progressPanel {
+                bottom: 60px;
+                width: 220px;
+            }
+            
+            .mode-card {
+                padding: 15px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -564,7 +589,7 @@
             <div id="bonusPanel" class="bonus-panel hidden">
                 <div>💰 Бонусы: +<span id="bonusPoints">0</span></div>
                 <div>🌟 Золотых: <span id="goldenCount" class="golden-count">0</span></div>
-                <div>⚡ Быстрых ответов: <span id="quickAnswers">0</span></div>
+                <div>⚡ Быстрых: <span id="quickAnswers">0</span></div>
             </div>
             
             <div id="levelPanel" class="panel">
@@ -576,7 +601,7 @@
             <button id="dictionaryBtn" class="btn">📚 Словарь</button>
             
             <div id="progressPanel" class="panel">
-                <div>🔄 Для повторения: <span id="revisionCount">0</span></div>
+                <div>🎯 Прогресс уровня</div>
                 <div class="progress-bar">
                     <div id="levelProgress" class="progress-fill" style="width: 0%"></div>
                 </div>
@@ -587,12 +612,12 @@
         <div id="modeSelection">
             <div class="screen-content">
                 <h1>❄️ Снежинки-слова</h1>
-                <p style="font-size: 1.2em; margin-bottom: 40px; color: #87CEEB;">Выберите режим игры</p>
+                <p style="font-size: 1.1em; margin-bottom: 30px; color: #87CEEB;">Выберите режим игры</p>
                 
-                <div style="display: flex; gap: 30px; flex-wrap: wrap; justify-content: center;">
+                <div style="display: flex; flex-direction: column; gap: 20px; width: 100%; max-width: 500px;">
                     <div class="mode-card">
                         <h2>📚 Проверка знаний</h2>
-                        <p>Все слова из списка падают по одному. У вас 3 жизни. Жизнь тратится при ошибке или если снежинка упала.</p>
+                        <p>Слова падают по одному. У вас 3 жизни. Жизнь тратится при ошибке или если снежинка упала.</p>
                         <button id="knowledgeMode" class="btn btn-success">Играть</button>
                     </div>
                     
@@ -621,7 +646,6 @@
             <div class="screen-content">
                 <h1>⏸️ ПАУЗА</h1>
                 <button id="resumeBtn" class="btn btn-success">▶️ Продолжить</button>
-                <button id="restartBtn" class="btn">🔄 Начать заново</button>
                 <button id="changeModeBtn" class="btn">🎮 Сменить режим</button>
             </div>
         </div>
@@ -662,8 +686,7 @@
                     <div>📝 Всего слов: <span id="totalWordsCompleted">0</span></div>
                     <div>🔥 Лучшая серия: <span id="bestStreak">0</span></div>
                 </div>
-                <button id="playAgainBtn" class="btn btn-success">🔄 Играть снова</button>
-                <button id="changeModeGameOver" class="btn">🎮 Сменить режим</button>
+                <button id="playAgainBtn" class="btn btn-success">🎮 Выбрать режим</button>
             </div>
         </div>
     </div>
@@ -719,7 +742,7 @@
                 this.level = 1;
                 this.wordsCompleted = 0;
                 this.totalWordsCompleted = 0;
-                this.wordsForRevision = [];
+                this.wordsWithErrors = new Set();
                 this.learnedWords = new Set();
                 this.gameState = 'modeSelection';
                 this.gameMode = 'knowledge';
@@ -776,11 +799,9 @@
                 
                 document.getElementById('pauseBtn').addEventListener('click', () => this.togglePause());
                 document.getElementById('resumeBtn').addEventListener('click', () => this.togglePause());
-                document.getElementById('restartBtn').addEventListener('click', () => this.restart());
                 document.getElementById('nextLevelBtn').addEventListener('click', () => this.nextLevel());
-                document.getElementById('playAgainBtn').addEventListener('click', () => this.restart());
+                document.getElementById('playAgainBtn').addEventListener('click', () => this.showModeSelection());
                 document.getElementById('changeModeBtn').addEventListener('click', () => this.showModeSelection());
-                document.getElementById('changeModeGameOver').addEventListener('click', () => this.showModeSelection());
                 document.getElementById('knowledgeMode').addEventListener('click', () => this.startGame('knowledge'));
                 document.getElementById('speedMode').addEventListener('click', () => this.startGame('speed'));
                 document.getElementById('dictionaryBtn').addEventListener('click', () => this.showDictionary());
@@ -796,7 +817,7 @@
                 this.lives = 3;
                 this.words = [];
                 this.stoppedWords = [];
-                this.wordsForRevision = [];
+                this.wordsWithErrors.clear();
                 this.learnedWords.clear();
                 this.usedWords.clear();
                 
@@ -810,15 +831,15 @@
                 
                 if (mode === 'knowledge') {
                     this.maxWordsOnScreen = 1;
-                    this.spawnTimer = 120;
+                    this.spawnTimer = 90;
                     this.needClickSelection = false;
                     document.getElementById('bonusPanel').classList.add('hidden');
                 } else {
                     this.maxWordsOnScreen = 2;
-                    this.spawnTimer = 90;
+                    this.spawnTimer = 60;
                     this.needClickSelection = true;
                     document.getElementById('bonusPanel').classList.remove('hidden');
-                    this.goldenTimer = Math.random() * 300 + 600;
+                    this.goldenTimer = Math.random() * 200 + 400;
                 }
                 
                 document.getElementById('gameMode').textContent = mode === 'knowledge' ? 'Проверка' : 'Скорость';
@@ -831,11 +852,11 @@
             createBackground() {
                 // Создание звезд
                 this.stars = [];
-                for (let i = 0; i < 150; i++) {
+                for (let i = 0; i < 120; i++) {
                     this.stars.push({
                         x: Math.random() * this.canvas.width,
                         y: Math.random() * (this.canvas.height * 0.7),
-                        size: Math.random() * 1.5 + 0.5,
+                        size: Math.random() * 1.2 + 0.5,
                         brightness: Math.random() * 0.8 + 0.2,
                         twinkleSpeed: Math.random() * 0.05 + 0.02,
                         twinkleOffset: Math.random() * Math.PI * 2
@@ -844,11 +865,11 @@
                 
                 // Создание облаков
                 this.clouds = [];
-                for (let i = 0; i < 5; i++) {
+                for (let i = 0; i < 4; i++) {
                     this.clouds.push({
                         x: Math.random() * this.canvas.width,
-                        y: Math.random() * 250,
-                        size: Math.random() * 40 + 60,
+                        y: Math.random() * 200,
+                        size: Math.random() * 30 + 50,
                         speed: Math.random() * 0.2 + 0.1,
                         opacity: Math.random() * 0.3 + 0.1
                     });
@@ -856,11 +877,11 @@
                 
                 // Создание фоновых снежинок
                 this.snowflakes = [];
-                for (let i = 0; i < 50; i++) {
+                for (let i = 0; i < 40; i++) {
                     this.snowflakes.push({
                         x: Math.random() * this.canvas.width,
                         y: Math.random() * this.canvas.height,
-                        size: Math.random() * 3 + 1,
+                        size: Math.random() * 2 + 1,
                         speed: Math.random() * 0.5 + 0.2,
                         opacity: Math.random() * 0.4 + 0.1,
                         sway: Math.random() * 0.5 - 0.25,
@@ -874,7 +895,7 @@
                 if (this.gameMode !== 'speed' || this.goldenSnowflakeActive) return;
                 
                 const x = Math.random() * (this.canvas.width - 200) + 100;
-                const speed = 2 + this.level * 0.3;
+                const speed = 2.5 + this.level * 0.3;
                 
                 // ВЫБИРАЕМ РАНДОМНОЕ СЛОВО ИЗ СЛОВАРЯ ДЛЯ ЗОЛОТОЙ СНЕЖИНКИ
                 const randomWordData = vocabulary[Math.floor(Math.random() * vocabulary.length)];
@@ -908,7 +929,8 @@
                 uniqueWords.forEach(word => {
                     const wordData = vocabulary.find(w => w.word === word);
                     const div = document.createElement('div');
-                    div.className = `word-item ${this.learnedWords.has(word) ? '' : 'revision-word'}`;
+                    const hasError = this.wordsWithErrors.has(word);
+                    div.className = `word-item ${hasError ? 'error-word' : ''}`;
                     
                     // Формируем текст с выделением правильных букв зеленым
                     let displayText = '';
@@ -1067,7 +1089,7 @@
                         }
                         
                         if (targetWord.completed) {
-                            // Особый бонус для золотой снежинки - ТОЛЬКО КОГДА ОНА ПОЛНОСТЬЮ ЗАПОЛНЕНА
+                            // Особый бонус для золотой снежинки
                             if (targetWord.isGolden) {
                                 this.goldenSnowflakes++;
                                 this.bonusPoints += 50;
@@ -1080,6 +1102,9 @@
                         }
                         return true;
                     } else {
+                        // Добавляем слово с ошибкой в список
+                        this.wordsWithErrors.add(targetWord.originalData.word);
+                        
                         // Сброс серии при ошибке
                         if (this.gameMode === 'speed') {
                             this.streak = 0;
@@ -1106,7 +1131,7 @@
                 word.startExplodeAnimation();
                 // Разный цвет взрыва для золотой снежинки
                 const particleColor = word.isGolden ? '#FFD700' : '#87CEEB';
-                this.createSnowExplosion(word.x, word.y, word.isGolden ? 35 : 20, particleColor);
+                this.createSnowExplosion(word.x, word.y, word.isGolden ? 25 : 15, particleColor);
                 
                 setTimeout(() => {
                     this.wordsCompleted++;
@@ -1131,11 +1156,10 @@
                     }
                     
                     this.updateUI();
-                }, 600);
+                }, 500);
             }
 
             handleWordError(word) {
-                this.wordsForRevision.push(word.originalData);
                 if (this.gameMode === 'knowledge') {
                     this.lives--;
                     if (this.lives <= 0) {
@@ -1165,8 +1189,8 @@
                 const wordData = availableWords[Math.floor(Math.random() * availableWords.length)];
                 this.usedWords.add(wordData.word);
                 
-                const x = Math.random() * (this.canvas.width - 400) + 200;
-                const baseSpeed = this.gameMode === 'knowledge' ? 1 : 1.8;
+                const x = Math.random() * (this.canvas.width - 300) + 150;
+                const baseSpeed = this.gameMode === 'knowledge' ? 1.5 : 2.0;
                 const speed = baseSpeed + this.level * 0.4;
                 
                 const newWord = new SnowflakeWord(wordData, x, -80, speed, this.ctx);
@@ -1182,7 +1206,7 @@
                 this.wordsCompleted = 0;
                 this.words = [];
                 this.stoppedWords = [];
-                this.spawnTimer = 60;
+                this.spawnTimer = 50;
                 this.maxWordsOnScreen = Math.min(this.level + 1, 3);
                 
                 this.createFireworks();
@@ -1194,19 +1218,19 @@
                 document.getElementById('bonusScore').textContent = this.bonusPoints;
                 document.getElementById('goldenScore').textContent = this.goldenSnowflakes;
                 document.getElementById('nextLevelInfo').textContent = 
-                    `Слов одновременно: ${this.maxWordsOnScreen}, Скорость: +${this.level * 40}%`;
+                    `Слов одновременно: ${this.maxWordsOnScreen}`;
                 
                 this.showScreen('levelUpScreen');
                 this.gameState = 'levelUp';
             }
 
             createFireworks() {
-                for (let i = 0; i < 30; i++) {
+                for (let i = 0; i < 20; i++) {
                     setTimeout(() => {
                         const x = Math.random() * this.canvas.width;
                         const y = Math.random() * this.canvas.height;
-                        this.createSnowExplosion(x, y, 8);
-                    }, i * 40);
+                        this.createSnowExplosion(x, y, 6);
+                    }, i * 50);
                 }
             }
 
@@ -1247,10 +1271,6 @@
                 this.hideZoomedWord();
             }
 
-            restart() {
-                this.startGame(this.gameMode);
-            }
-
             update() {
                 if (this.gameState !== 'playing') return;
 
@@ -1284,7 +1304,7 @@
                     this.goldenTimer--;
                     if (this.goldenTimer <= 0) {
                         this.createGoldenSnowflake();
-                        this.goldenTimer = Math.random() * 300 + 600;
+                        this.goldenTimer = Math.random() * 200 + 400;
                     }
                 }
 
@@ -1313,7 +1333,7 @@
                 this.spawnTimer--;
                 if (this.spawnTimer <= 0) {
                     this.spawnWord();
-                    this.spawnTimer = this.gameMode === 'knowledge' ? 180 : 100 - (this.level * 8);
+                    this.spawnTimer = this.gameMode === 'knowledge' ? 120 : 80 - (this.level * 5);
                 }
                 
                 // Обновление частиц и бонусных текстов
@@ -1350,6 +1370,9 @@
             }
 
             handleFallenWord(word) {
+                // Добавляем слово в список с ошибками
+                this.wordsWithErrors.add(word.originalData.word);
+                
                 if (word.isGolden) {
                     this.goldenSnowflakeActive = false;
                 }
@@ -1400,7 +1423,6 @@
                 document.getElementById('lives').textContent = this.lives;
                 document.getElementById('level').textContent = this.level;
                 document.getElementById('wordsCompleted').textContent = this.wordsCompleted;
-                document.getElementById('revisionCount').textContent = this.wordsForRevision.length;
                 document.getElementById('streakCounter').textContent = this.streak;
                 
                 // Обновление бонусной панели
@@ -1488,7 +1510,7 @@
                         this.ctx.save();
                         this.ctx.globalAlpha = particle.life;
                         this.ctx.fillStyle = particle.color;
-                        this.ctx.font = 'bold 24px Montserrat';
+                        this.ctx.font = 'bold 20px Montserrat';
                         this.ctx.textAlign = 'center';
                         this.ctx.fillText(particle.text, particle.x, particle.y);
                         this.ctx.restore();
@@ -1500,14 +1522,14 @@
                 // Внешнее свечение
                 const glow = this.ctx.createRadialGradient(
                     this.moon.x, this.moon.y, 0,
-                    this.moon.x, this.moon.y, this.moon.size * 3
+                    this.moon.x, this.moon.y, this.moon.size * 2
                 );
                 glow.addColorStop(0, 'rgba(255, 255, 220, 0.2)');
                 glow.addColorStop(1, 'rgba(255, 255, 220, 0)');
                 
                 this.ctx.fillStyle = glow;
                 this.ctx.beginPath();
-                this.ctx.arc(this.moon.x, this.moon.y, this.moon.size * 3, 0, Math.PI * 2);
+                this.ctx.arc(this.moon.x, this.moon.y, this.moon.size * 2, 0, Math.PI * 2);
                 this.ctx.fill();
 
                 // Основная часть луны
@@ -1519,9 +1541,8 @@
                 // Кратеры на луне
                 this.ctx.fillStyle = '#E8E8C8';
                 this.ctx.beginPath();
-                this.ctx.arc(this.moon.x - 12, this.moon.y - 8, 6, 0, Math.PI * 2);
-                this.ctx.arc(this.moon.x + 10, this.moon.y + 6, 4, 0, Math.PI * 2);
-                this.ctx.arc(this.moon.x + 5, this.moon.y - 12, 3, 0, Math.PI * 2);
+                this.ctx.arc(this.moon.x - 10, this.moon.y - 6, 4, 0, Math.PI * 2);
+                this.ctx.arc(this.moon.x + 8, this.moon.y + 4, 3, 0, Math.PI * 2);
                 this.ctx.fill();
             }
 
@@ -1533,7 +1554,6 @@
                 this.ctx.arc(0, 0, size * 0.6, 0, Math.PI * 2);
                 this.ctx.arc(size * 0.8, -size * 0.3, size * 0.7, 0, Math.PI * 2);
                 this.ctx.arc(size * 1.4, size * 0.1, size * 0.6, 0, Math.PI * 2);
-                this.ctx.arc(size * 0.9, size * 0.4, size * 0.5, 0, Math.PI * 2);
                 this.ctx.fill();
                 
                 this.ctx.restore();
@@ -1546,34 +1566,24 @@
                     this.ctx.rotate(flake.rotation);
                     this.ctx.globalAlpha = flake.opacity;
                     
-                    this.ctx.strokeStyle = 'rgba(200, 220, 255, 0.8)';
+                    this.ctx.strokeStyle = 'rgba(200, 220, 255, 0.6)';
                     this.ctx.lineWidth = 1;
                     this.ctx.lineCap = 'round';
                     
-                    // Снежинка с закругленными краями
+                    // Упрощенная снежинка для фона
                     for (let i = 0; i < 6; i++) {
                         this.ctx.rotate(Math.PI / 3);
                         
-                        // Основной луч с закруглением на конце
                         this.ctx.beginPath();
                         this.ctx.moveTo(0, 0);
-                        this.ctx.lineTo(0, flake.size * 4);
+                        this.ctx.lineTo(0, flake.size * 3);
                         this.ctx.stroke();
                         
-                        // Боковые ответвления
                         this.ctx.beginPath();
                         this.ctx.moveTo(0, flake.size);
-                        this.ctx.lineTo(-flake.size * 1.5, flake.size * 2);
+                        this.ctx.lineTo(-flake.size, flake.size * 1.5);
                         this.ctx.moveTo(0, flake.size);
-                        this.ctx.lineTo(flake.size * 1.5, flake.size * 2);
-                        this.ctx.stroke();
-                        
-                        // Верхние ответвления
-                        this.ctx.beginPath();
-                        this.ctx.moveTo(0, flake.size * 3);
-                        this.ctx.lineTo(-flake.size, flake.size * 2.5);
-                        this.ctx.moveTo(0, flake.size * 3);
-                        this.ctx.lineTo(flake.size, flake.size * 2.5);
+                        this.ctx.lineTo(flake.size, flake.size * 1.5);
                         this.ctx.stroke();
                     }
                     
@@ -1656,7 +1666,7 @@
 
             update() {
                 if (this.exploding) {
-                    this.explodeProgress += 0.02;
+                    this.explodeProgress += 0.03;
                     if (this.explodeProgress >= 1) {
                         return false;
                     }
@@ -1721,13 +1731,13 @@
             drawSnowflakeShape() {
                 const alpha = this.isSelected ? 1 : 0.6;
                 const color = this.isGolden ? '#FFD700' : `rgba(135, 206, 235, ${alpha})`;
-                const lineWidth = this.isSelected ? 4 : this.isGolden ? 3 : 2;
+                const lineWidth = this.isSelected ? 3 : this.isGolden ? 2 : 1.5;
                 
                 if (this.isGolden) {
                     // Анимация свечения для золотой снежинки
                     const glowIntensity = 0.7 + 0.3 * Math.sin(Date.now() * 0.005);
-                    this.ctx.shadowColor = 'rgba(255, 215, 0, 0.7)';
-                    this.ctx.shadowBlur = 10 * glowIntensity;
+                    this.ctx.shadowColor = 'rgba(255, 215, 0, 0.6)';
+                    this.ctx.shadowBlur = 8 * glowIntensity;
                 }
                 
                 this.ctx.strokeStyle = color;
@@ -1735,42 +1745,38 @@
                 this.ctx.lineCap = 'round';
                 this.ctx.globalAlpha = alpha;
                 
-                // Улучшенная снежинка с закругленными краями
+                // Упрощенная снежинка
                 for (let i = 0; i < 6; i++) {
                     this.ctx.rotate(Math.PI / 3);
                     
-                    // Основной луч с закруглением на конце
                     this.ctx.beginPath();
                     this.ctx.moveTo(0, 0);
-                    this.ctx.lineTo(0, 50);
+                    this.ctx.lineTo(0, 40);
                     this.ctx.stroke();
                     
-                    // Верхние боковые ответвления
                     this.ctx.beginPath();
-                    this.ctx.moveTo(0, 15);
-                    this.ctx.lineTo(-12, 20);
-                    this.ctx.moveTo(0, 15);
-                    this.ctx.lineTo(12, 20);
+                    this.ctx.moveTo(0, 12);
+                    this.ctx.lineTo(-10, 16);
+                    this.ctx.moveTo(0, 12);
+                    this.ctx.lineTo(10, 16);
                     this.ctx.stroke();
                     
-                    // Нижние боковые ответвления
                     this.ctx.beginPath();
-                    this.ctx.moveTo(0, 35);
-                    this.ctx.lineTo(-10, 45);
-                    this.ctx.moveTo(0, 35);
-                    this.ctx.lineTo(10, 45);
+                    this.ctx.moveTo(0, 28);
+                    this.ctx.lineTo(-8, 36);
+                    this.ctx.moveTo(0, 28);
+                    this.ctx.lineTo(8, 36);
                     this.ctx.stroke();
                     
-                    // Украшения на концах лучей
                     this.ctx.beginPath();
-                    this.ctx.arc(0, 50, 3, 0, Math.PI * 2);
+                    this.ctx.arc(0, 40, 2, 0, Math.PI * 2);
                     this.ctx.fill();
                 }
                 
                 // Центральный круг
                 this.ctx.fillStyle = color;
                 this.ctx.beginPath();
-                this.ctx.arc(0, 0, this.isGolden ? 6 : 4, 0, Math.PI * 2);
+                this.ctx.arc(0, 0, this.isGolden ? 5 : 3, 0, Math.PI * 2);
                 this.ctx.fill();
                 
                 this.ctx.globalAlpha = 1;
@@ -1779,10 +1785,10 @@
 
             drawWordText() {
                 const displayText = this.getDisplayText();
-                const fontSize = this.isGolden ? 24 : 20;
+                const fontSize = this.isGolden ? 20 : 18;
                 const alpha = this.isSelected ? 1 : 0.7;
                 const textColor = this.isGolden ? '#FFD700' : `rgba(255, 255, 255, ${alpha})`;
-                const shadowColor = this.isGolden ? 'rgba(255, 215, 0, 0.7)' : `rgba(0, 0, 0, ${alpha})`;
+                const shadowColor = this.isGolden ? 'rgba(255, 215, 0, 0.6)' : `rgba(0, 0, 0, ${alpha})`;
                 
                 this.ctx.font = `600 ${fontSize}px 'Montserrat', sans-serif`;
                 this.ctx.textAlign = 'center';
@@ -1790,7 +1796,7 @@
                 
                 // Тень для текста
                 this.ctx.strokeStyle = shadowColor;
-                this.ctx.lineWidth = this.isGolden ? 6 : 4;
+                this.ctx.lineWidth = this.isGolden ? 5 : 3;
                 this.ctx.strokeText(displayText, 0, 0);
                 
                 // Основной текст
@@ -1799,9 +1805,9 @@
                 
                 // Дополнительная надпись для золотой снежинки
                 if (this.isGolden) {
-                    this.ctx.font = `bold 14px 'Montserrat', sans-serif`;
+                    this.ctx.font = `bold 12px 'Montserrat', sans-serif`;
                     this.ctx.fillStyle = '#FFD700';
-                    this.ctx.fillText('★ БОНУС ★', 0, 25);
+                    this.ctx.fillText('★ БОНУС ★', 0, 20);
                 }
             }
 
@@ -1863,9 +1869,9 @@
             constructor(x, y, ctx, color = '#87CEEB') {
                 this.x = x;
                 this.y = y;
-                this.size = Math.random() * 5 + 2;
-                this.speedX = Math.random() * 8 - 4;
-                this.speedY = Math.random() * 8 - 4;
+                this.size = Math.random() * 4 + 1;
+                this.speedX = Math.random() * 6 - 3;
+                this.speedY = Math.random() * 6 - 3;
                 this.life = 1.0;
                 this.ctx = ctx;
                 this.rotation = Math.random() * Math.PI * 2;
@@ -1889,23 +1895,22 @@
                 this.ctx.globalAlpha = this.life;
                 
                 this.ctx.strokeStyle = this.color;
-                this.ctx.lineWidth = 2;
+                this.ctx.lineWidth = 1.5;
                 this.ctx.lineCap = 'round';
                 
-                // Улучшенная частица снежинки
+                // Упрощенная частица снежинки
                 for (let i = 0; i < 6; i++) {
                     this.ctx.rotate(Math.PI / 3);
                     this.ctx.beginPath();
                     this.ctx.moveTo(0, 0);
-                    this.ctx.lineTo(0, this.size * 2);
+                    this.ctx.lineTo(0, this.size * 1.5);
                     this.ctx.stroke();
                     
-                    // Маленькие боковые веточки
                     this.ctx.beginPath();
-                    this.ctx.moveTo(0, this.size);
-                    this.ctx.lineTo(-this.size * 0.7, this.size * 1.3);
-                    this.ctx.moveTo(0, this.size);
-                    this.ctx.lineTo(this.size * 0.7, this.size * 1.3);
+                    this.ctx.moveTo(0, this.size * 0.8);
+                    this.ctx.lineTo(-this.size * 0.6, this.size * 1.2);
+                    this.ctx.moveTo(0, this.size * 0.8);
+                    this.ctx.lineTo(this.size * 0.6, this.size * 1.2);
                     this.ctx.stroke();
                 }
                 
